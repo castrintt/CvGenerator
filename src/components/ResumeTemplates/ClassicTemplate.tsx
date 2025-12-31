@@ -5,11 +5,12 @@ import type {ResumeData} from "../../../business/domain/models/curriculum.model.
 const Container = styled.div`
     padding: 40px;
     font-family: 'Helvetica', sans-serif;
-    color: #333;
+    color: #000;
+    background-color: white;
 `;
 
 const Header = styled.header`
-    border-bottom: 2px solid #333;
+    border-bottom: 2px solid #000;
     padding-bottom: 20px;
     margin-bottom: 30px;
 `;
@@ -19,6 +20,7 @@ const Name = styled.h1`
     margin: 0 0 10px 0;
     text-transform: uppercase;
     letter-spacing: 2px;
+    color: #000;
 `;
 
 const ContactInfo = styled.div`
@@ -26,7 +28,7 @@ const ContactInfo = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
-    color: #666;
+    color: #333;
 `;
 
 const Section = styled.section`
@@ -36,10 +38,11 @@ const Section = styled.section`
 const SectionTitle = styled.h2`
     font-size: 18px;
     text-transform: uppercase;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid #666;
     padding-bottom: 5px;
     margin-bottom: 15px;
-    color: #444;
+    color: #000;
+    font-weight: bold;
 `;
 
 const Item = styled.div`
@@ -56,22 +59,26 @@ const ItemTitle = styled.h3`
     font-size: 16px;
     margin: 0;
     font-weight: bold;
+    color: #000;
 `;
 
 const ItemSubtitle = styled.div`
     font-size: 14px;
     font-style: italic;
+    color: #333;
 `;
 
 const Date = styled.span`
     font-size: 14px;
-    color: #666;
+    color: #333;
+    font-weight: 500;
 `;
 
 const Description = styled.p`
     font-size: 14px;
     margin: 5px 0 0 0;
     line-height: 1.5;
+    color: #000;
 `;
 
 const SkillsList = styled.div`
@@ -85,7 +92,24 @@ const SkillTag = styled.span`
     padding: 5px 10px;
     border-radius: 4px;
     font-size: 12px;
+    color: #000;
+    font-weight: 500;
 `;
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
+    if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
+    
+    // Caso contrário, tenta converter do formato YYYY-MM
+    const parts = dateString.split('-');
+    if (parts.length === 2) {
+        const [year, month] = parts;
+        return `${month}/${year}`;
+    }
+    
+    return dateString;
+};
 
 export const ClassicTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
     return (
@@ -112,7 +136,7 @@ export const ClassicTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                     <Item key={index}>
                         <ItemHeader>
                             <ItemTitle>{exp.position}</ItemTitle>
-                            <Date>{exp.startDate} - {exp.endDate === "" ? "Atualmente" : exp.endDate}</Date>
+                            <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
                         </ItemHeader>
                         <ItemSubtitle>{exp.company}</ItemSubtitle>
                         <Description>{exp.description}</Description>
@@ -126,7 +150,7 @@ export const ClassicTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                     <Item key={index}>
                         <ItemHeader>
                             <ItemTitle>{edu.institution}</ItemTitle>
-                            <Date>{edu.graduationDate === "" ? "Cursando": edu.graduationDate}</Date>
+                            <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
                         </ItemHeader>
                         <ItemSubtitle>{edu.degree} em {edu.fieldOfStudy}</ItemSubtitle>
                     </Item>

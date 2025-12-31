@@ -104,6 +104,21 @@ const SkillTag = styled.div`
     border-left: 3px solid #e74c3c;
 `;
 
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
+    if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
+    
+    // Caso contrário, tenta converter do formato YYYY-MM
+    const parts = dateString.split('-');
+    if (parts.length === 2) {
+        const [year, month] = parts;
+        return `${month}/${year}`;
+    }
+    
+    return dateString;
+};
+
 export const MinimalistTemplate: React.FC<{ data: ResumeData }> = ({ data }) => {
   return (
     <Container>
@@ -131,7 +146,7 @@ export const MinimalistTemplate: React.FC<{ data: ResumeData }> = ({ data }) => 
               <Item key={index}>
                 <ItemTitle>{exp.position}</ItemTitle>
                 <ItemSubtitle>{exp.company}</ItemSubtitle>
-                <Date>{exp.startDate} - {exp.endDate === "" ? "Atualmente" : exp.endDate}</Date>
+                <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
                 <Description>{exp.description}</Description>
               </Item>
             ))}
@@ -145,7 +160,7 @@ export const MinimalistTemplate: React.FC<{ data: ResumeData }> = ({ data }) => 
               <div key={index} style={{ marginBottom: '20px' }}>
                 <ItemTitle>{edu.institution}</ItemTitle>
                 <ItemSubtitle>{edu.degree}</ItemSubtitle>
-                <Date>{edu.graduationDate === "" ? "Cursando": edu.graduationDate}</Date>
+                <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
               </div>
             ))}
           </Section>

@@ -9,6 +9,25 @@
   --border-color: #E0E0E0;
   --background-color: #FFFFFF;
   --sidebar-bg: #FAFAFA;
+  --input-bg: #FFFFFF;
+  --card-bg: #FAFAFA;
+  --button-text: #FFFFFF;
+  --button-bg: #000000;
+}
+
+[data-theme='dark'] {
+  --primary-color: #FFFFFF;
+  --secondary-color: #333333;
+  --accent-color: #56CCF2;
+  --text-primary: #F2F2F2;
+  --text-secondary: #BDBDBD;
+  --border-color: #4F4F4F;
+  --background-color: #121212;
+  --sidebar-bg: #1E1E1E;
+  --input-bg: #2C2C2C;
+  --card-bg: #1E1E1E;
+  --button-text: #000000;
+  --button-bg: #FFFFFF;
 }
 
 body {
@@ -20,6 +39,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--background-color);
   color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {

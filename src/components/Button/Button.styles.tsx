@@ -3,7 +3,7 @@ import styled from "styled-components";
 export const StyledButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'outline'; $fullWidth?: boolean }>`
     padding: 12px 24px;
     border-radius: 8px;
-    border: ${props => props.$variant === 'outline' ? '1px solid #E0E0E0' : 'none'};
+    border: ${props => props.$variant === 'outline' ? '1px solid var(--border-color)' : 'none'};
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -13,30 +13,31 @@ export const StyledButton = styled.button<{ $variant?: 'primary' | 'secondary' |
 
     background-color: ${props => {
         switch(props.$variant) {
-            case 'primary': return '#000000';
-            case 'secondary': return '#F2F2F2';
+            case 'primary': return 'var(--button-bg)';
+            case 'secondary': return 'var(--secondary-color)';
             case 'outline': return 'transparent';
-            default: return '#000000';
+            default: return 'var(--button-bg)';
         }
     }};
 
     color: ${props => {
         switch(props.$variant) {
-            case 'primary': return '#FFFFFF';
-            case 'secondary': return '#333333';
-            case 'outline': return '#333333';
-            default: return '#FFFFFF';
+            case 'primary': return 'var(--button-text)';
+            case 'secondary': return 'var(--text-primary)';
+            case 'outline': return 'var(--text-primary)';
+            default: return 'var(--button-text)';
         }
     }};
 
     &:hover {
         opacity: 0.9;
         transform: translateY(-1px);
+        border-color: ${props => props.$variant === 'outline' ? 'var(--text-primary)' : 'transparent'};
     }
 
     &:disabled {
-        background-color: #E0E0E0;
-        color: #828282;
+        background-color: var(--border-color);
+        color: var(--text-secondary);
         cursor: not-allowed;
         transform: none;
     }

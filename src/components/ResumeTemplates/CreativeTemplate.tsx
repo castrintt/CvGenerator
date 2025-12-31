@@ -112,6 +112,21 @@ const SkillTag = styled.span`
     font-weight: 500;
 `;
 
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
+    if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
+    
+    // Caso contrário, tenta converter do formato YYYY-MM
+    const parts = dateString.split('-');
+    if (parts.length === 2) {
+        const [year, month] = parts;
+        return `${month}/${year}`;
+    }
+    
+    return dateString;
+};
+
 export const CreativeTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
     const currentTitle = data.experience.length > 0 ? data.experience[0].position : '';
 
@@ -142,7 +157,7 @@ export const CreativeTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                         <ExperienceItem key={index}>
                             <JobHeader>
                                 <JobTitle>{exp.position}</JobTitle>
-                                <JobDate>{exp.startDate} - {exp.endDate === "" ? "Atualmente" : exp.endDate}</JobDate>
+                                <JobDate>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</JobDate>
                             </JobHeader>
                             <Company>{exp.company}</Company>
                             <Description>{exp.description}</Description>
@@ -156,7 +171,7 @@ export const CreativeTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                         <ExperienceItem key={index}>
                             <JobHeader>
                                 <JobTitle>{edu.institution}</JobTitle>
-                                <JobDate>{edu.graduationDate === "" ? "Cursando": edu.graduationDate}</JobDate>
+                                <JobDate>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</JobDate>
                             </JobHeader>
                             <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
                         </ExperienceItem>

@@ -15,12 +15,13 @@ export const Container = styled.div`
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--background-color);
+    color: var(--text-primary);
 `;
 
 export const Spinner = styled.div`
     border: 6px solid rgba(37, 117, 252, 0.1);
-    border-top: 6px solid #2575fc;
+    border-top: 6px solid var(--accent-color);
     border-radius: 50%;
     width: 80px;
     height: 80px;
@@ -30,20 +31,17 @@ export const Spinner = styled.div`
 `;
 
 export const Message = styled.h2`
-    color: #333;
+    color: var(--text-primary);
     font-weight: 600;
     font-size: 1.8rem;
     text-align: center;
-    background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
 `;
 
 export const SuccessIcon = styled.div`
     color: #2ecc71;
     font-size: 80px;
     margin-bottom: 20px;
-    background: white;
+    background: var(--card-bg);
     width: 120px;
     height: 120px;
     border-radius: 50%;
@@ -51,4 +49,9 @@ export const SuccessIcon = styled.div`
     align-items: center;
     justify-content: center;
     box-shadow: 0 10px 30px rgba(46, 204, 113, 0.3);
+    
+    svg {
+        width: 60px;
+        height: 60px;
+    }
 `;

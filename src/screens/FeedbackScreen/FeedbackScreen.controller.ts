@@ -1,14 +1,22 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {FeedbackData, feedbackSchema, type ResumeControllerInjectTypes} from './FeedbackScreen.types';
 import {useResumeContext} from "../../context/ResumeContext.tsx";
+import {useNavigate} from "react-router-dom";
 
 
 export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInjectTypes) => {
     const [isFeedbackSent, setIsFeedbackSent] = useState(false);
     const [downloadFormat, setDownloadFormat] = useState<'pdf' | 'png' | 'jpeg'>('pdf');
     const {resumeData} = useResumeContext()
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!resumeData) {
+            navigate('/');
+        }
+    }, [resumeData, navigate]);
 
     const {
         register,

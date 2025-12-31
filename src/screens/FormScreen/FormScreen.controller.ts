@@ -78,6 +78,23 @@ export const UseFormScreenController = () => {
         register('personalInfo.phone').onChange(e);
     };
 
+    const maskDate = (value: string) => {
+        if (!value) return "";
+        value = value.replace(/\D/g, "");
+        if (value.length > 6) value = value.slice(0, 6);
+
+        if (value.length > 2) {
+            return value.replace(/^(\d{2})(\d{0,4}).*/, "$1/$2");
+        } else {
+            return value;
+        }
+    };
+
+    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => {
+        e.target.value = maskDate(e.target.value);
+        register(fieldName).onChange(e);
+    };
+
     useEffect(() => {
         const handleScroll = () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
@@ -126,7 +143,8 @@ export const UseFormScreenController = () => {
             setTemplate: (id: number) => setValue('selectedTemplate', id),
             watch,
             setValue,
-            handlePhoneChange
+            handlePhoneChange,
+            handleDateChange
         },
         states: {
             errors,

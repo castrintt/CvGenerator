@@ -3,13 +3,13 @@ import styled from 'styled-components';
 export const Container = styled.div`
     display: flex;
     min-height: 100vh;
-    background-color: #f4f7f6;
+    background-color: var(--background-color);
 `;
 
 export const Sidebar = styled.div`
     width: 400px;
-    background: linear-gradient(180deg, #6a11cb 0%, #2575fc 100%);
-    color: white;
+    background: var(--sidebar-bg);
+    color: var(--text-primary);
     padding: 40px;
     box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1);
     display: flex;
@@ -18,6 +18,7 @@ export const Sidebar = styled.div`
     height: 100vh;
     overflow-y: auto;
     z-index: 10;
+    border-right: 1px solid var(--border-color);
 `;
 
 export const PreviewArea = styled.div`
@@ -27,6 +28,7 @@ export const PreviewArea = styled.div`
     display: flex;
     justify-content: center;
     overflow-y: auto;
+    background-color: var(--secondary-color);
 `;
 
 export const ResumePreview = styled.div`
@@ -38,6 +40,7 @@ export const ResumePreview = styled.div`
     box-sizing: border-box;
     transform: scale(0.9);
     transform-origin: top center;
+    color: black; /* Ensure resume content is always black on white */
 `;
 
 export const FeedbackForm = styled.form`
@@ -49,6 +52,7 @@ export const FeedbackForm = styled.form`
         font-size: 15px;
         line-height: 1.6;
         opacity: 0.9;
+        color: var(--text-primary);
     }
 `;
 
@@ -56,30 +60,30 @@ export const TextArea = styled.textarea`
     width: 100%;
     padding: 15px;
     border-radius: 12px;
-    border: none;
+    border: 1px solid var(--border-color);
     min-height: 180px;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     font-size: 15px;
     resize: vertical;
-    background-color: rgba(255, 255, 255, 0.1);
-    color: white;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
     transition: all 0.2s ease;
 
     &:focus {
         outline: none;
-        background-color: rgba(255, 255, 255, 0.2);
-        box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.2);
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 4px rgba(45, 156, 219, 0.1);
     }
 
     &::placeholder {
-        color: rgba(255, 255, 255, 0.6);
+        color: var(--text-secondary);
     }
 `;
 
 export const DownloadSection = styled.div`
     margin-top: 30px;
     padding-top: 30px;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -94,34 +98,35 @@ export const FormatSelector = styled.div`
 export const FormatOption = styled.button<{ $selected: boolean }>`
     flex: 1;
     padding: 10px;
-    border: 2px solid ${props => props.$selected ? '#fff' : 'rgba(255, 255, 255, 0.5)'};
-    background-color: ${props => props.$selected ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
-    color: white;
+    border: 2px solid ${props => props.$selected ? 'var(--accent-color)' : 'var(--border-color)'};
+    background-color: ${props => props.$selected ? 'rgba(45, 156, 219, 0.1)' : 'transparent'};
+    color: var(--text-primary);
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
     transition: all 0.2s ease;
 
     &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--secondary-color);
     }
 `;
 
 export const Title = styled.h2`
     margin-top: 0;
     margin-bottom: 20px;
-    color: white;
+    color: var(--text-primary);
     font-size: 1.8rem;
     font-weight: 700;
 `;
 
 export const SuccessMessage = styled.div`
-    background-color: rgba(46, 204, 113, 0.8);
-    color: white;
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #27ae60;
     padding: 20px;
     border-radius: 12px;
     margin-bottom: 20px;
     text-align: center;
     font-weight: 500;
+    border: 1px solid #27ae60;
 `;

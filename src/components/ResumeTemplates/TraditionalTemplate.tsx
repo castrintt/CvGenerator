@@ -9,24 +9,27 @@ const Container = styled.div`
     display: flex;
     flex-direction: column;
     height: 100%;
+    background-color: white;
 `;
 
 const Header = styled.header`
     background-color: #f4f4f4;
     padding: 40px;
     text-align: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #000;
 `;
 
 const Name = styled.h1`
     font-size: 32px;
     margin: 0 0 10px 0;
     font-weight: bold;
+    color: #000;
 `;
 
 const ContactInfo = styled.div`
     font-size: 14px;
-    color: #555;
+    color: #000;
+    font-weight: 500;
 `;
 
 const Main = styled.div`
@@ -44,6 +47,7 @@ const SectionTitle = styled.h2`
     padding-bottom: 5px;
     margin-bottom: 15px;
     font-weight: bold;
+    color: #000;
 `;
 
 const Item = styled.div`
@@ -56,6 +60,7 @@ const Left = styled.div`
     font-size: 14px;
     font-weight: bold;
     flex-shrink: 0;
+    color: #000;
 `;
 
 const Right = styled.div`
@@ -66,18 +71,21 @@ const ItemTitle = styled.h3`
     font-size: 16px;
     margin: 0 0 5px 0;
     font-weight: bold;
+    color: #000;
 `;
 
 const ItemSubtitle = styled.div`
     font-size: 14px;
     font-style: italic;
     margin-bottom: 5px;
+    color: #000;
 `;
 
 const Description = styled.p`
     font-size: 14px;
     margin: 0;
     line-height: 1.4;
+    color: #000;
 `;
 
 const SkillList = styled.ul`
@@ -90,7 +98,14 @@ const SkillList = styled.ul`
 
 const SkillItem = styled.li`
     font-size: 14px;
+    color: #000;
 `;
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    const [year, month] = dateString.split('-');
+    return `${month}/${year}`;
+};
 
 export const TraditionalTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
     return (
@@ -112,7 +127,7 @@ export const TraditionalTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                     <SectionTitle>Experiência</SectionTitle>
                     {data.experience.map((exp, index) => (
                         <Item key={index}>
-                            <Left>{exp.startDate} - {exp.endDate === "" ? "Atualmente" : exp.endDate}</Left>
+                            <Left>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Left>
                             <Right>
                                 <ItemTitle>{exp.position}</ItemTitle>
                                 <ItemSubtitle>{exp.company}</ItemSubtitle>
@@ -126,7 +141,7 @@ export const TraditionalTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                     <SectionTitle>Educação</SectionTitle>
                     {data.education.map((edu, index) => (
                         <Item key={index}>
-                            <Left>{edu.graduationDate === "" ? "Cursando" : edu.graduationDate}</Left>
+                            <Left>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Left>
                             <Right>
                                 <ItemTitle>{edu.institution}</ItemTitle>
                                 <ItemSubtitle>{edu.degree} em {edu.fieldOfStudy}</ItemSubtitle>

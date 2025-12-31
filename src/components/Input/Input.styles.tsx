@@ -11,27 +11,27 @@ export const Label = styled.label`
     margin-bottom: 8px;
     font-weight: 500;
     font-size: 14px;
-    color: #333333;
+    color: var(--text-primary);
 `;
 
 export const StyledInput = styled.input<{ $hasError?: boolean }>`
     padding: 12px 16px;
     border-radius: 8px;
-    border: 1px solid ${props => props.$hasError ? '#EB5757' : '#E0E0E0'};
+    border: 1px solid ${props => props.$hasError ? '#EB5757' : 'var(--border-color)'};
     font-size: 14px;
     font-family: 'Inter', sans-serif;
     transition: all 0.2s ease;
-    background-color: #FFFFFF;
-    color: #333333;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
 
     &:focus {
         outline: none;
-        border-color: #2D9CDB;
+        border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.1);
     }
 
     &::placeholder {
-        color: #BDBDBD;
+        color: var(--text-secondary);
     }
 `;
 

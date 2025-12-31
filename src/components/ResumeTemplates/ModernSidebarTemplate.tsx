@@ -21,6 +21,7 @@ const Main = styled.div`
     width: 70%;
     padding: 40px;
     background-color: white;
+    color: #333;
 `;
 
 const Name = styled.h1`
@@ -114,6 +115,21 @@ const Description = styled.p`
     margin: 0;
 `;
 
+const formatDate = (dateString: string) => {
+    if (!dateString) return "";
+    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
+    if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
+    
+    // Caso contrário, tenta converter do formato YYYY-MM
+    const parts = dateString.split('-');
+    if (parts.length === 2) {
+        const [year, month] = parts;
+        return `${month}/${year}`;
+    }
+    
+    return dateString;
+};
+
 export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
     const getSkillWidth = (level: string) => {
         switch (level) {
@@ -169,7 +185,7 @@ export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) =>
                         <ExperienceItem key={index}>
                             <JobTitle>{exp.position}</JobTitle>
                             <Company>{exp.company}</Company>
-                            <Date>{exp.startDate} - {exp.endDate === "" ? "Atualmente" : exp.endDate}</Date>
+                            <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
                             <Description>{exp.description}</Description>
                         </ExperienceItem>
                     ))}
@@ -181,7 +197,7 @@ export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) =>
                         <ExperienceItem key={index}>
                             <JobTitle>{edu.institution}</JobTitle>
                             <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
-                            <Date>{edu.graduationDate === "" ? "Cursando": edu.graduationDate}</Date>
+                            <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
                         </ExperienceItem>
                     ))}
                 </MainSection>

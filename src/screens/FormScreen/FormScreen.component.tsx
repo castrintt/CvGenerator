@@ -1,26 +1,121 @@
-import React from 'react';
-import {Container, Divider, ExperienceCard, Header, MainContent, RemoveButton, Row, Section, Select, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplatePreview, TextArea, Title} from './FormScreen.styles';
+import React, {useEffect, useState} from 'react';
+import {CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Select, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
 import type {FormScreenComponentProps} from "./FormScreen.types.ts";
+import {ClassicTemplate} from '../../components/ResumeTemplates/ClassicTemplate';
+import {ModernSidebarTemplate} from '../../components/ResumeTemplates/ModernSidebarTemplate';
+import {MinimalistTemplate} from '../../components/ResumeTemplates/MinimalistTemplate';
+import {TraditionalTemplate} from '../../components/ResumeTemplates/TraditionalTemplate';
+import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplate';
+import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
+import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
+import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
+import type {ResumeData} from "../../business/domain/models/curriculum.model.ts";
 
-const TEMPLATE_IMAGES = {
-    1: "https://placehold.co/400x600/FFFFFF/333333?text=Classico&font=lora",
-    2: "https://placehold.co/400x600/2c3e50/FFFFFF?text=Moderno+Lateral&font=lato",
-    3: "https://placehold.co/400x600/F5F5F5/333333?text=Minimalista&font=roboto",
-    4: "https://placehold.co/400x600/FFF8E1/333333?text=Tradicional&font=playfair-display",
-    5: "https://placehold.co/400x600/6c5ce7/FFFFFF?text=Criativo&font=montserrat"
+const FAKE_DATA: ResumeData = {
+    personalInfo: {
+        fullName: "João Silva",
+        email: "joao@email.com",
+        phone: "(11) 99999-9999",
+        address: "São Paulo, SP",
+        linkedin: "linkedin.com/in/joaosilva"
+    },
+    summary: "Profissional dedicado com experiência em desenvolvimento de software...",
+    experience: [
+        {
+            company: "Tech Solutions",
+            position: "Desenvolvedor Senior",
+            startDate: "2020-01",
+            endDate: "2023-01",
+            description: "Liderança técnica de equipe..."
+        }
+    ],
+    education: [
+        {
+            institution: "Universidade de São Paulo",
+            degree: "Bacharelado",
+            fieldOfStudy: "Ciência da Computação",
+            graduationDate: "2019-12"
+        }
+    ],
+    skills: [
+        {name: "React", level: "Avançado"},
+        {name: "Node.js", level: "Intermediário"}
+    ],
+    selectedTemplate: 1
+};
+
+const RenderTemplatePreview = (templateId: number) => {
+    const data = {...FAKE_DATA, selectedTemplate: templateId};
+    switch (templateId) {
+        case 1: return <ClassicTemplate data={data}/>;
+        case 2: return <ModernSidebarTemplate data={data}/>;
+        case 3: return <MinimalistTemplate data={data}/>;
+        case 4: return <TraditionalTemplate data={data}/>;
+        case 5: return <CreativeTemplate data={data}/>;
+        case 6: return <ProfessionalTemplate data={data}/>;
+        case 7: return <ElegantTemplate data={data}/>;
+        case 8: return <TechTemplate data={data}/>;
+        default: return <ClassicTemplate data={data}/>;
+    }
 };
 
 const TEMPLATE_NAMES = [
-    {id: 1, name: "Clássico", image: TEMPLATE_IMAGES[1]},
-    {id: 2, name: "Moderno Lateral", image: TEMPLATE_IMAGES[2]},
-    {id: 3, name: "Minimalista", image: TEMPLATE_IMAGES[3]},
-    {id: 4, name: "Tradicional", image: TEMPLATE_IMAGES[4]},
-    {id: 5, name: "Criativo", image: TEMPLATE_IMAGES[5]}
+    {id: 1, name: "Clássico"},
+    {id: 2, name: "Moderno Lateral"},
+    {id: 3, name: "Minimalista"},
+    {id: 4, name: "Tradicional"},
+    {id: 5, name: "Criativo"},
+    {id: 6, name: "Profissional"},
+    {id: 7, name: "Elegante"},
+    {id: 8, name: "Tech (Dark)"}
 ];
 
 export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({controller}) => {
+    const [previewTemplateId, setPreviewTemplateId] = useState<number | null>(null);
+    const [scale, setScale] = useState(1);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (!previewTemplateId) return;
+            
+            // A4 dimensions in mm
+            const a4HeightMm = 297;
+            const a4WidthMm = 210;
+            
+            // Convert mm to px (approximate 96 DPI)
+            const a4HeightPx = (a4HeightMm * 96) / 25.4;
+            const a4WidthPx = (a4WidthMm * 96) / 25.4;
+            
+            // Get viewport dimensions with some padding
+            const vh = window.innerHeight - 80; // 40px padding top/bottom
+            const vw = window.innerWidth - 80;  // 40px padding left/right
+            
+            // Calculate scale to fit
+            const scaleHeight = vh / a4HeightPx;
+            const scaleWidth = vw / a4WidthPx;
+            
+            // Use the smaller scale to ensure it fits both dimensions
+            const newScale = Math.min(scaleHeight, scaleWidth, 1); // Max scale 1
+            setScale(newScale);
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial calculation
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [previewTemplateId]);
+
+    const openPreview = (id: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setPreviewTemplateId(id);
+    };
+
+    const closePreview = () => {
+        setPreviewTemplateId(null);
+    };
+
     return (
         <Container>
             <Sidebar>
@@ -60,6 +155,10 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     <h1>Crie seu Currículo Profissional</h1>
                     <p>Preencha os campos abaixo para gerar um currículo de alta qualidade em minutos.</p>
                 </Header>
+
+                <PrivacyNotice>
+                    <strong>Privacidade Garantida:</strong> Nenhum dado pessoal inserido neste formulário é salvo em nossos servidores. Todas as informações permanecem no seu navegador e são descartadas assim que você fecha a página. A única preferência salva é o modo de cor (claro/escuro).
+                </PrivacyNotice>
 
                 <form onSubmit={controller.actions.handleSubmit}>
                     <Section id="personal">
@@ -126,14 +225,18 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                                error={controller.states.errors.experience?.[index]?.position?.message}/>
                                     </Row>
                                     <Row>
-                                        <Input label="Data de Início"
-                                               type="date" {...controller.actions.register(`experience.${index}.startDate`)}
+                                        <Input label="Data de Início (MM/AAAA)"
+                                               placeholder="MM/AAAA"
+                                               {...controller.actions.register(`experience.${index}.startDate`)}
+                                               onChange={(e) => controller.actions.handleDateChange(e, `experience.${index}.startDate`)}
                                                error={controller.states.errors.experience?.[index]?.startDate?.message}/>
 
                                         <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
                                             {!isCurrent && (
-                                                <Input label="Data de Término"
-                                                       type="date" {...controller.actions.register(`experience.${index}.endDate`)}
+                                                <Input label="Data de Término (MM/AAAA)"
+                                                       placeholder="MM/AAAA"
+                                                       {...controller.actions.register(`experience.${index}.endDate`)}
+                                                       onChange={(e) => controller.actions.handleDateChange(e, `experience.${index}.endDate`)}
                                                        error={controller.states.errors.experience?.[index]?.endDate?.message}/>
                                             )}
                                             <div
@@ -194,13 +297,14 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                                error={controller.states.errors.education?.[index]?.fieldOfStudy?.message}/>
 
                                         <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                                            {!isStudying && (
-                                                <Input label="Data de Graduação"
-                                                       type="date" {...controller.actions.register(`education.${index}.graduationDate`)}
-                                                       error={controller.states.errors.education?.[index]?.graduationDate?.message}/>
-                                            )}
+                                            <Input label={isStudying ? "Previsão de Conclusão (Opcional) (MM/AAAA)" : "Data de Graduação (MM/AAAA)"}
+                                                   placeholder="MM/AAAA"
+                                                   {...controller.actions.register(`education.${index}.graduationDate`)}
+                                                   onChange={(e) => controller.actions.handleDateChange(e, `education.${index}.graduationDate`)}
+                                                   error={controller.states.errors.education?.[index]?.graduationDate?.message}/>
+                                            
                                             <div
-                                                style={{display: 'flex', alignItems: 'center', marginTop: isStudying ? '30px' : '0'}}>
+                                                style={{display: 'flex', alignItems: 'center', marginTop: '10px'}}>
                                                 <input
                                                     type="checkbox"
                                                     id={`studying-${index}`}
@@ -269,7 +373,9 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                     $selected={controller.states.selectedTemplate === template.id}
                                     onClick={() => controller.actions.setTemplate(template.id)}
                                 >
-                                    <TemplatePreview $image={template.image}/>
+                                    <TemplateMiniature onClick={(e) => openPreview(template.id, e)} style={{cursor: 'zoom-in', pointerEvents: 'auto'}}>
+                                        {RenderTemplatePreview(template.id)}
+                                    </TemplateMiniature>
                                     <h3>{template.name}</h3>
                                 </TemplateCard>
                             ))}
@@ -283,6 +389,17 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     </SubmitButtonContainer>
                 </form>
             </MainContent>
+
+            {previewTemplateId && (
+                <ModalOverlay onClick={closePreview}>
+                    <ModalContent onClick={e => e.stopPropagation()}>
+                        <CloseButton onClick={closePreview}>×</CloseButton>
+                        <PreviewContainer $scale={scale}>
+                            {RenderTemplatePreview(previewTemplateId)}
+                        </PreviewContainer>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
         </Container>
     );
 };

@@ -3,7 +3,8 @@ import styled from 'styled-components';
 export const Container = styled.div`
     display: flex;
     min-height: 100vh;
-    background-color: #FFFFFF;
+    background-color: var(--background-color);
+    color: var(--text-primary);
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -12,8 +13,8 @@ export const Container = styled.div`
 
 export const Sidebar = styled.div`
     width: 320px;
-    background-color: #FAFAFA;
-    border-right: 1px solid #E0E0E0;
+    background-color: var(--sidebar-bg);
+    border-right: 1px solid var(--border-color);
     padding: 40px 24px;
     display: flex;
     flex-direction: column;
@@ -27,7 +28,7 @@ export const Sidebar = styled.div`
         height: auto;
         position: relative;
         border-right: none;
-        border-bottom: 1px solid #E0E0E0;
+        border-bottom: 1px solid var(--border-color);
         padding: 20px;
     }
 `;
@@ -55,7 +56,7 @@ export const Header = styled.div`
     h1 {
         font-size: 32px;
         margin-bottom: 12px;
-        color: #333;
+        color: var(--text-primary);
 
         @media (max-width: 768px) {
             font-size: 24px;
@@ -63,7 +64,7 @@ export const Header = styled.div`
     }
 
     p {
-        color: #828282;
+        color: var(--text-secondary);
         font-size: 16px;
 
         @media (max-width: 768px) {
@@ -83,7 +84,7 @@ export const Section = styled.section`
 
 export const Title = styled.h2`
     margin-bottom: 24px;
-    color: #333;
+    color: var(--text-primary);
     font-size: 20px;
     font-weight: 600;
     display: flex;
@@ -94,7 +95,7 @@ export const Title = styled.h2`
         display: block;
         width: 4px;
         height: 24px;
-        background-color: #2D9CDB;
+        background-color: var(--accent-color);
         margin-right: 12px;
         border-radius: 2px;
     }
@@ -122,7 +123,7 @@ export const Row = styled.div`
 
 export const TemplateGrid = styled.div`
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 24px;
     margin-top: 24px;
 
@@ -132,17 +133,17 @@ export const TemplateGrid = styled.div`
 `;
 
 export const TemplateCard = styled.div<{ $selected: boolean }>`
-    border: 2px solid ${props => props.$selected ? '#2D9CDB' : '#E0E0E0'};
+    border: 2px solid ${props => props.$selected ? 'var(--accent-color)' : 'var(--border-color)'};
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
-    background: #FFFFFF;
+    background: var(--card-bg);
     position: relative;
     overflow: hidden;
 
     &:hover {
-        border-color: ${props => props.$selected ? '#2D9CDB' : '#BDBDBD'};
+        border-color: ${props => props.$selected ? 'var(--accent-color)' : 'var(--text-secondary)'};
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
@@ -151,31 +152,31 @@ export const TemplateCard = styled.div<{ $selected: boolean }>`
         margin: 12px 0 0 0;
         font-size: 14px;
         font-weight: 500;
-        color: ${props => props.$selected ? '#2D9CDB' : '#333'};
+        color: ${props => props.$selected ? 'var(--accent-color)' : 'var(--text-primary)'};
         text-align: center;
     }
 `;
 
-export const TemplatePreview = styled.div<{ $image?: string }>`
-    height: 240px;
-    background-color: #F5F5F5;
-    border-radius: 8px;
-    position: relative;
+export const TemplateMiniature = styled.div`
+    width: 100%;
+    height: 300px;
+    background-color: white;
     overflow: hidden;
-    background-image: url(${props => props.$image});
-    background-size: cover;
-    background-position: top center;
-    border: 1px solid #eee;
+    position: relative;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    pointer-events: none; /* Prevent interaction with the resume content */
 
-    &:after {
-        content: '';
+    & > div {
+        transform: scale(0.28); 
+        transform-origin: top left;
+        width: 210mm; 
+        min-height: 297mm; 
         position: absolute;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(0, 0, 0, 0.05) 100%);
-        pointer-events: none;
+        background-color: white;
+        color: black; /* Ensure resume is always black on white */
     }
 `;
 
@@ -183,23 +184,24 @@ export const TextArea = styled.textarea`
     width: 100%;
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--border-color);
     min-height: 140px;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     resize: vertical;
     margin-bottom: 24px;
     transition: all 0.2s ease;
-    color: #333;
+    color: var(--text-primary);
+    background-color: var(--input-bg);
 
     &:focus {
         outline: none;
-        border-color: #2D9CDB;
+        border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.1);
     }
 
     &::placeholder {
-        color: #BDBDBD;
+        color: var(--text-secondary);
     }
 `;
 
@@ -207,13 +209,13 @@ export const Select = styled.select`
     width: 100%;
     padding: 12px 16px;
     border-radius: 8px;
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--border-color);
     margin-bottom: 24px;
-    background-color: white;
+    background-color: var(--input-bg);
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     cursor: pointer;
-    color: #333;
+    color: var(--text-primary);
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -222,7 +224,7 @@ export const Select = styled.select`
 
     &:focus {
         outline: none;
-        border-color: #2D9CDB;
+        border-color: var(--accent-color);
         box-shadow: 0 0 0 3px rgba(45, 156, 219, 0.1);
     }
 `;
@@ -253,22 +255,22 @@ export const Step = styled.div<{ $active: boolean }>`
     display: flex;
     align-items: center;
     gap: 12px;
-    color: ${props => props.$active ? '#2D9CDB' : '#828282'};
+    color: ${props => props.$active ? 'var(--accent-color)' : 'var(--text-secondary)'};
     font-weight: ${props => props.$active ? '600' : '400'};
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
 
     &:hover {
-        color: ${props => props.$active ? '#2D9CDB' : '#333'};
+        color: ${props => props.$active ? 'var(--accent-color)' : 'var(--text-primary)'};
     }
 
     span {
         width: 24px;
         height: 24px;
         border-radius: 50%;
-        background-color: ${props => props.$active ? '#2D9CDB' : 'transparent'};
-        border: 1px solid ${props => props.$active ? '#2D9CDB' : '#E0E0E0'};
+        background-color: ${props => props.$active ? 'var(--accent-color)' : 'transparent'};
+        border: 1px solid ${props => props.$active ? 'var(--accent-color)' : 'var(--border-color)'};
         color: ${props => props.$active ? '#FFF' : 'inherit'};
         display: flex;
         align-items: center;
@@ -280,13 +282,13 @@ export const Step = styled.div<{ $active: boolean }>`
 
 export const Divider = styled.hr`
     border: none;
-    border-top: 1px solid #E0E0E0;
+    border-top: 1px solid var(--border-color);
     margin: 32px 0;
 `;
 
 export const ExperienceCard = styled.div`
-    background: #FAFAFA;
-    border: 1px solid #E0E0E0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 24px;
     margin-bottom: 24px;
@@ -294,7 +296,7 @@ export const ExperienceCard = styled.div`
     transition: all 0.2s ease;
 
     &:hover {
-        border-color: #BDBDBD;
+        border-color: var(--text-secondary);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
@@ -342,5 +344,82 @@ export const SubmitButtonContainer = styled.div`
         button {
             width: 100%;
         }
+    }
+`;
+
+export const PrivacyNotice = styled.div`
+    background-color: rgba(45, 156, 219, 0.1);
+    border: 1px solid var(--accent-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.5;
+    
+    strong {
+        color: var(--accent-color);
+    }
+`;
+
+export const ModalOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+`;
+
+export const ModalContent = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    position: relative;
+`;
+
+export const PreviewContainer = styled.div<{ $scale: number }>`
+    width: 210mm;
+    height: 297mm;
+    background-color: white;
+    transform: scale(${props => props.$scale});
+    transform-origin: center center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+    
+    /* Ensure text is black even in dark mode */
+    color: black;
+`;
+
+export const CloseButton = styled.button`
+    position: absolute;
+    top: -50px;
+    right: 0;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.2s;
+    
+    &:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
     }
 `;

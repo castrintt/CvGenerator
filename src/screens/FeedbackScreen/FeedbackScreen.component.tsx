@@ -6,22 +6,22 @@ import {ModernSidebarTemplate} from '../../components/ResumeTemplates/ModernSide
 import {MinimalistTemplate} from '../../components/ResumeTemplates/MinimalistTemplate';
 import {TraditionalTemplate} from '../../components/ResumeTemplates/TraditionalTemplate';
 import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplate';
+import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
+import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
+import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
 import type {FeedbackScreenComponentProps} from "./FeedbackScreen.types.ts";
 
 const RenderTemplate = (resumeData: any) => {
     switch (resumeData.selectedTemplate) {
-        case 1:
-            return <ClassicTemplate data={resumeData}/>;
-        case 2:
-            return <ModernSidebarTemplate data={resumeData}/>;
-        case 3:
-            return <MinimalistTemplate data={resumeData}/>;
-        case 4:
-            return <TraditionalTemplate data={resumeData}/>;
-        case 5:
-            return <CreativeTemplate data={resumeData}/>;
-        default:
-            return <ClassicTemplate data={resumeData}/>;
+        case 1: return <ClassicTemplate data={resumeData}/>;
+        case 2: return <ModernSidebarTemplate data={resumeData}/>;
+        case 3: return <MinimalistTemplate data={resumeData}/>;
+        case 4: return <TraditionalTemplate data={resumeData}/>;
+        case 5: return <CreativeTemplate data={resumeData}/>;
+        case 6: return <ProfessionalTemplate data={resumeData}/>;
+        case 7: return <ElegantTemplate data={resumeData}/>;
+        case 8: return <TechTemplate data={resumeData}/>;
+        default: return <ClassicTemplate data={resumeData}/>;
     }
 };
 
@@ -68,13 +68,13 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
                     </>
                 ) : (
                     <FeedbackForm onSubmit={controller.actions.handleSubmit}>
-                        <p>Por favor, forneça seu feedback para desbloquear o botão de download.</p>
+                        <p>Não é necessário cadastro! O serviço é 100% gratuito. Para liberar o botão de download, por favor envie um feedback anônimo para nos ajudar a melhorar a plataforma.</p>
                         <TextArea
                             placeholder="O que você gostou? O que podemos melhorar?"
                             {...controller.actions.register('feedback')}
                         />
                         {controller.states.errors.feedback &&
-                         <span style={{color: 'red'}}>{controller.states.errors.feedback.message}</span>}
+                         <span style={{color: '#EB5757'}}>{controller.states.errors.feedback.message}</span>}
 
                         <Button type="submit" disabled={controller.states.isSubmitting}>
                             {controller.states.isSubmitting ? 'Enviando...' : 'Enviar Feedback'}

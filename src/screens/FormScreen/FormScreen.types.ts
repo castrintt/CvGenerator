@@ -10,18 +10,23 @@ export const personalInfoSchema = z.object({
     website: z.string().optional(),
 });
 
+const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
+
 export const experienceSchema = z.object({
     company: z.string().min(2, 'Nome da empresa é obrigatório'),
     position: z.string().min(2, 'Cargo é obrigatório'),
-    startDate: z.string().nonempty('Data de início é obrigatória'),
+    startDate: z.string().regex(dateRegex, 'Data inválida (MM/AAAA)'),
     endDate: z.string().optional(),
     isCurrent: z.boolean().optional(),
     description: z.string().min(10, 'Descrição deve ter no minimo 10 caracteres'),
 }).refine((data) => {
-    return !(!data.isCurrent && !data.endDate);
-
+    if (!data.isCurrent) {
+        if (!data.endDate) return false;
+        return dateRegex.test(data.endDate);
+    }
+    return true;
 }, {
-    message: "Data de término é obrigatória se não for o emprego atual",
+    message: "Data de término é obrigatória e deve ser válida (MM/AAAA) se não for o emprego atual",
     path: ["endDate"],
 });
 
@@ -32,10 +37,17 @@ export const educationSchema = z.object({
     graduationDate: z.string().optional(),
     isStudying: z.boolean().optional(),
 }).refine((data) => {
-    return !(!data.isStudying && !data.graduationDate);
-
+    if (!data.isStudying) {
+        if (!data.graduationDate) return false;
+        return dateRegex.test(data.graduationDate);
+    }
+    // Se estiver estudando, a data é opcional, mas se fornecida deve ser válida
+    if (data.graduationDate && data.graduationDate.length > 0) {
+        return dateRegex.test(data.graduationDate);
+    }
+    return true;
 }, {
-    message: "Data de graduação é obrigatória se não estiver cursando",
+    message: "Data de graduação é obrigatória e deve ser válida (MM/AAAA) se não estiver cursando",
     path: ["graduationDate"],
 });
 
@@ -77,6 +89,7 @@ export type  FormScreenComponentProps = {
             watch: any;
             setValue: any;
             handlePhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+            handleDateChange: (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => void;
         };
         states: {
             activeSection: string
