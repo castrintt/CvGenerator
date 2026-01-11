@@ -28,6 +28,7 @@ const Name = styled.h1`
     font-size: 28px;
     margin: 0 0 20px 0;
     line-height: 1.2;
+    color: white;
 `;
 
 const SidebarSection = styled.div`
@@ -41,12 +42,14 @@ const SidebarTitle = styled.h3`
     padding-bottom: 10px;
     margin-bottom: 15px;
     letter-spacing: 1px;
+    color: white;
 `;
 
 const ContactItem = styled.div`
     font-size: 13px;
     margin-bottom: 10px;
     word-break: break-word;
+    color: white;
 `;
 
 const SkillItem = styled.div`
@@ -56,6 +59,7 @@ const SkillItem = styled.div`
 const SkillName = styled.div`
     font-size: 14px;
     margin-bottom: 5px;
+    color: white;
 `;
 
 const ProgressBar = styled.div`

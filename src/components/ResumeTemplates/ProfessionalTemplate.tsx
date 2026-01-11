@@ -27,12 +27,14 @@ const Name = styled.h1`
     margin: 0;
     text-transform: uppercase;
     letter-spacing: 1px;
+    color: white;
 `;
 
 const HeaderRight = styled.div`
     text-align: right;
     font-size: 13px;
     line-height: 1.5;
+    color: white;
 `;
 
 const MainContent = styled.div`
