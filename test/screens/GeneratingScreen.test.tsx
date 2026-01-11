@@ -1,10 +1,8 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { GeneratingScreen } from '../../src/screens/GeneratingScreen/GeneratingScreen';
 import { BrowserRouter } from 'react-router-dom';
 import '@testing-library/jest-dom';
 
-// Mock framer-motion to avoid animation issues in tests
 jest.mock('framer-motion', () => ({
     motion: {
         div: ({ children, ...props }: any) => <div {...props}>{children}</div>,

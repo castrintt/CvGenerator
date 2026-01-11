@@ -115,10 +115,8 @@ const SkillFill = styled.div<{ width: string }>`
 
 const formatDate = (dateString: string) => {
     if (!dateString) return "";
-    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
     if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
     
-    // Caso contrário, tenta converter do formato YYYY-MM
     const parts = dateString.split('-');
     if (parts.length === 2) {
         const [year, month] = parts;

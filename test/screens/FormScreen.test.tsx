@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { FormScreen } from '../../src/screens/FormScreen/FormScreen';
 import { ResumeProvider } from '../../src/context/ResumeContext';

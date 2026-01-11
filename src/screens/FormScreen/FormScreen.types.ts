@@ -41,7 +41,6 @@ export const educationSchema = z.object({
         if (!data.graduationDate) return false;
         return dateRegex.test(data.graduationDate);
     }
-    // Se estiver estudando, a data é opcional, mas se fornecida deve ser válida
     if (data.graduationDate && data.graduationDate.length > 0) {
         return dateRegex.test(data.graduationDate);
     }

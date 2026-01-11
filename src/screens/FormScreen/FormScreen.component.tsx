@@ -11,7 +11,7 @@ import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplat
 import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
 import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
 import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
-import type {ResumeData} from "../../business/domain/models/curriculum.model.ts";
+import type {ResumeData} from "../../../business/domain/models/curriculum.model.ts";
 
 const FAKE_DATA: ResumeData = {
     personalInfo: {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ElegantTemplate } from '../../../src/components/ResumeTemplates/ElegantTemplate';
 import { ResumeData } from '../../../business/domain/models/curriculum.model';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ResumeProvider, useResumeContext } from '../../src/context/ResumeContext';
 import { ResumeData } from '../../business/domain/models/curriculum.model';

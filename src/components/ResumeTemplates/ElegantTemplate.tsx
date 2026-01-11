@@ -5,7 +5,7 @@ import type {ResumeData} from "../../../business/domain/models/curriculum.model.
 const Container = styled.div`
     font-family: 'Georgia', serif;
     color: #444;
-    background-color: #fffaf0; /* Floral White */
+    background-color: #fffaf0;
     height: 100%;
     padding: 50px;
     border: 1px solid #e0e0e0;
@@ -13,7 +13,7 @@ const Container = styled.div`
 
 const Header = styled.header`
     text-align: center;
-    border-bottom: 1px solid #d4af37; /* Gold color */
+    border-bottom: 1px solid #d4af37;
     padding-bottom: 30px;
     margin-bottom: 40px;
 `;
@@ -114,10 +114,8 @@ const SkillTag = styled.span`
 
 const formatDate = (dateString: string) => {
     if (!dateString) return "";
-    // Se a data já estiver no formato MM/AAAA, retorna ela mesma
     if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
     
-    // Caso contrário, tenta converter do formato YYYY-MM
     const parts = dateString.split('-');
     if (parts.length === 2) {
         const [year, month] = parts;

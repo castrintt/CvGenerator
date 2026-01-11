@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { TraditionalTemplate } from '../../../src/components/ResumeTemplates/TraditionalTemplate';
 import { ResumeData } from '../../../business/domain/models/curriculum.model';

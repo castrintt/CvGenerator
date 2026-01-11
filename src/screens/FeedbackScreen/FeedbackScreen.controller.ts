@@ -27,13 +27,11 @@ export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInj
     });
 
     const onSubmit = async (data: FeedbackData) => {
-        // TODO: Substitua pelos seus IDs do EmailJS (https://www.emailjs.com/)
         const SERVICE_ID = 'YOUR_SERVICE_ID';
         const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
         const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
 
         try {
-            // Verifica se as chaves foram configuradas
             if (SERVICE_ID === 'YOUR_SERVICE_ID') {
                 console.warn('EmailJS não configurado. Simulando envio...');
                 console.log('Feedback:', data.feedback);
@@ -44,7 +42,7 @@ export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInj
                     TEMPLATE_ID,
                     {
                         message: data.feedback,
-                        to_email: 'igordc38@gmail.com', // Variável que deve estar no seu template do EmailJS
+                        to_email: 'igordc38@gmail.com',
                         from_name: 'Usuário CV Generator'
                     },
                     PUBLIC_KEY

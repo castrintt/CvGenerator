@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ModernSidebarTemplate } from '../../../src/components/ResumeTemplates/ModernSidebarTemplate';
 import { ResumeData } from '../../../business/domain/models/curriculum.model';
