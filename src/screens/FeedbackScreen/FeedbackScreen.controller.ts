@@ -27,27 +27,27 @@ export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInj
     });
 
     const onSubmit = async (data: FeedbackData) => {
-        const SERVICE_ID = 'YOUR_SERVICE_ID';
-        const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-        const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+        const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
         try {
-            if (SERVICE_ID === 'YOUR_SERVICE_ID') {
-                console.warn('EmailJS não configurado. Simulando envio...');
-                console.log('Feedback:', data.feedback);
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            } else {
-                await emailjs.send(
-                    SERVICE_ID,
-                    TEMPLATE_ID,
-                    {
-                        message: data.feedback,
-                        to_email: 'igordc38@gmail.com',
-                        from_name: 'Usuário CV Generator'
-                    },
-                    PUBLIC_KEY
-                );
+            if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+                console.error('EmailJS keys are missing in environment variables');
+                alert('Erro de configuração: Chaves do EmailJS não encontradas.');
+                return;
             }
+
+            await emailjs.send(
+                SERVICE_ID,
+                TEMPLATE_ID,
+                {
+                    message: data.feedback,
+                    to_email: 'igordc38@gmail.com',
+                    from_name: 'Usuário CV Generator'
+                },
+                PUBLIC_KEY
+            );
             
             setIsFeedbackSent(true);
         } catch (error) {

@@ -15,7 +15,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "types": ["jest", "@testing-library/jest-dom"]
+    "types": ["jest", "@testing-library/jest-dom", "vite/client"]
   },
   "include": ["src", "test", "jest.setup.ts", "test/types.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
