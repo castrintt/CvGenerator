@@ -52,27 +52,20 @@ const ContactItem = styled.div`
     color: white;
 `;
 
-const SkillItem = styled.div`
-    margin-bottom: 10px;
+const CourseItem = styled.div`
+    margin-bottom: 15px;
 `;
 
-const SkillName = styled.div`
+const CourseName = styled.div`
     font-size: 14px;
-    margin-bottom: 5px;
+    font-weight: bold;
     color: white;
+    margin-bottom: 2px;
 `;
 
-const ProgressBar = styled.div`
-    height: 4px;
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-`;
-
-const Progress = styled.div<{ width: string }>`
-    height: 100%;
-    background-color: #3498db;
-    width: ${props => props.width};
-    border-radius: 2px;
+const CourseInstitution = styled.div`
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
 `;
 
 const MainSection = styled.section`
@@ -133,21 +126,6 @@ const formatDate = (dateString: string) => {
 };
 
 export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
-    const getSkillWidth = (level: string) => {
-        switch (level) {
-            case 'Iniciante':
-                return '25%';
-            case 'Intermediário':
-                return '50%';
-            case 'Avançado':
-                return '75%';
-            case 'Especialista':
-                return '100%';
-            default:
-                return '50%';
-        }
-    };
-
     return (
         <Container>
             <Sidebar>
@@ -162,17 +140,17 @@ export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) =>
                     {data.personalInfo.website && <ContactItem>{data.personalInfo.website}</ContactItem>}
                 </SidebarSection>
 
-                <SidebarSection>
-                    <SidebarTitle>Habilidades</SidebarTitle>
-                    {data.skills.map((skill, index) => (
-                        <SkillItem key={index}>
-                            <SkillName>{skill.name}</SkillName>
-                            <ProgressBar>
-                                <Progress width={getSkillWidth(skill.level)}/>
-                            </ProgressBar>
-                        </SkillItem>
-                    ))}
-                </SidebarSection>
+                {data.courses && data.courses.length > 0 && (
+                    <SidebarSection>
+                        <SidebarTitle>Cursos</SidebarTitle>
+                        {data.courses.map((course, index) => (
+                            <CourseItem key={index}>
+                                <CourseName>{course.name}</CourseName>
+                                <CourseInstitution>{course.institution} {course.duration ? `(${course.duration})` : ''}</CourseInstitution>
+                            </CourseItem>
+                        ))}
+                    </SidebarSection>
+                )}
             </Sidebar>
 
             <Main>
@@ -181,28 +159,45 @@ export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) =>
                     <Description>{data.summary}</Description>
                 </MainSection>
 
-                <MainSection>
-                    <MainTitle>Experiência</MainTitle>
-                    {data.experience.map((exp, index) => (
-                        <ExperienceItem key={index}>
-                            <JobTitle>{exp.position}</JobTitle>
-                            <Company>{exp.company}</Company>
-                            <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
-                            <Description>{exp.description}</Description>
-                        </ExperienceItem>
-                    ))}
-                </MainSection>
+                {data.experience && data.experience.length > 0 && (
+                    <MainSection>
+                        <MainTitle>Experiência</MainTitle>
+                        {data.experience.map((exp, index) => (
+                            <ExperienceItem key={index}>
+                                <JobTitle>{exp.position}</JobTitle>
+                                <Company>{exp.company}</Company>
+                                <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
+                                <Description>{exp.description}</Description>
+                            </ExperienceItem>
+                        ))}
+                    </MainSection>
+                )}
 
-                <MainSection>
-                    <MainTitle>Educação</MainTitle>
-                    {data.education.map((edu, index) => (
-                        <ExperienceItem key={index}>
-                            <JobTitle>{edu.institution}</JobTitle>
-                            <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
-                            <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
-                        </ExperienceItem>
-                    ))}
-                </MainSection>
+                {data.education && data.education.length > 0 && (
+                    <MainSection>
+                        <MainTitle>Formação Acadêmica</MainTitle>
+                        {data.education.map((edu, index) => (
+                            <ExperienceItem key={index}>
+                                <JobTitle>{edu.institution}</JobTitle>
+                                <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
+                                <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
+                            </ExperienceItem>
+                        ))}
+                    </MainSection>
+                )}
+
+                {data.schooling && data.schooling.length > 0 && (
+                    <MainSection>
+                        <MainTitle>Escolaridade</MainTitle>
+                        {data.schooling.map((sch, index) => (
+                            <ExperienceItem key={index}>
+                                <JobTitle>{sch.institution}</JobTitle>
+                                <Company>{sch.degree}</Company>
+                                <Date>{sch.completionDate ? formatDate(sch.completionDate) : ""}</Date>
+                            </ExperienceItem>
+                        ))}
+                    </MainSection>
+                )}
             </Main>
         </Container>
     );

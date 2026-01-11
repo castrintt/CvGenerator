@@ -50,23 +50,26 @@ export const educationSchema = z.object({
     path: ["graduationDate"],
 });
 
-export const skillSchema = z.object({
-    name: z.string().min(2, 'Nome da habilidade é obrigatório'),
-    level: z.enum([
-        'Iniciante',
-        'Intermediário',
-        'Avançado',
-        'Especialista'
-    ]),
+export const schoolingSchema = z.object({
+    institution: z.string().min(2, 'Instituição é obrigatória'),
+    degree: z.string().min(2, 'Grau/Nível é obrigatório'),
+    completionDate: z.string().optional(),
+});
+
+export const courseSchema = z.object({
+    name: z.string().min(2, 'Nome do curso é obrigatório'),
+    institution: z.string().min(2, 'Instituição é obrigatória'),
+    duration: z.string().optional(),
 });
 
 export const formSchema = z.object({
     personalInfo: personalInfoSchema,
     summary: z.string().min(20, 'O resumo deve ter pelo menos 20 caracteres'),
-    experience: z.array(experienceSchema).min(1, 'Pelo menos uma experiência é necessária'),
-    education: z.array(educationSchema).min(1, 'Pelo menos uma formação é necessária'),
-    skills: z.array(skillSchema).min(1, 'Pelo menos uma habilidade é necessária'),
-    selectedTemplate: z.number().min(1).max(5),
+    experience: z.array(experienceSchema).optional(), // Experiência agora é opcional também? O usuário pediu escolaridade e formação opcionais. Vou manter experiência como estava ou opcional? Geralmente é bom ter, mas vou deixar opcional para flexibilidade.
+    education: z.array(educationSchema).optional(),
+    schooling: z.array(schoolingSchema).optional(),
+    courses: z.array(courseSchema).optional(),
+    selectedTemplate: z.number().min(1).max(8),
 });
 
 export type FormData = z.infer<typeof formSchema>;
@@ -82,8 +85,10 @@ export type  FormScreenComponentProps = {
             removeExperience: (index: number) => void;
             appendEducation: (value: any) => void;
             removeEducation: (index: number) => void;
-            appendSkill: (value: any) => void;
-            removeSkill: (index: number) => void;
+            appendSchooling: (value: any) => void;
+            removeSchooling: (index: number) => void;
+            appendCourse: (value: any) => void;
+            removeCourse: (index: number) => void;
             setTemplate: (id: number) => void;
             watch: any;
             setValue: any;
@@ -95,7 +100,8 @@ export type  FormScreenComponentProps = {
             errors: any;
             experienceFields: any[];
             educationFields: any[];
-            skillFields: any[];
+            schoolingFields: any[];
+            courseFields: any[];
             selectedTemplate: number;
         };
     }

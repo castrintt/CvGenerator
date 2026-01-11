@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { CreativeTemplate } from '../../../src/components/ResumeTemplates/CreativeTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -30,10 +30,12 @@ const mockData: ResumeData = {
             graduationDate: '2019-12'
         }
     ],
-    skills: [
+    schooling: [],
+    courses: [
         {
-            name: 'React',
-            level: 'Avançado'
+            name: 'React Course',
+            institution: 'Udemy',
+            duration: '40h'
         }
     ],
     selectedTemplate: 5
@@ -69,9 +71,9 @@ describe('CreativeTemplate', () => {
         expect(screen.getByText(/Bachelor/)).toBeInTheDocument();
     });
 
-    it('renders skills correctly', () => {
+    it('renders courses correctly', () => {
         render(<CreativeTemplate data={mockData} />);
         
-        expect(screen.getByText('React')).toBeInTheDocument();
+        expect(screen.getByText('React Course')).toBeInTheDocument();
     });
 });

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { TraditionalTemplate } from '../../../src/components/ResumeTemplates/TraditionalTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -30,10 +30,12 @@ const mockData: ResumeData = {
             graduationDate: '2019-12'
         }
     ],
-    skills: [
+    schooling: [],
+    courses: [
         {
-            name: 'React',
-            level: 'Avançado'
+            name: 'React Course',
+            institution: 'Udemy',
+            duration: '40h'
         }
     ],
     selectedTemplate: 4
@@ -69,10 +71,9 @@ describe('TraditionalTemplate', () => {
         expect(screen.getByText(/Bachelor/)).toBeInTheDocument();
     });
 
-    it('renders skills correctly', () => {
+    it('renders courses correctly', () => {
         render(<TraditionalTemplate data={mockData} />);
         
-        expect(screen.getByText(/React/)).toBeInTheDocument();
-        expect(screen.getByText(/Avançado/)).toBeInTheDocument();
+        expect(screen.getByText('React Course')).toBeInTheDocument();
     });
 });

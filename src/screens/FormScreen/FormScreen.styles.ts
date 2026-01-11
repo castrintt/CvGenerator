@@ -374,6 +374,7 @@ export const ModalOverlay = styled.div`
     justify-content: center;
     z-index: 1000;
     padding: 20px;
+    cursor: pointer; /* Indica que é clicável */
 `;
 
 export const ModalContent = styled.div`
@@ -385,6 +386,7 @@ export const ModalContent = styled.div`
     box-shadow: none;
     padding: 0;
     position: relative;
+    cursor: default; /* Reseta o cursor dentro do conteúdo */
 `;
 
 export const PreviewContainer = styled.div<{ $scale: number }>`
@@ -419,7 +421,16 @@ export const CloseButton = styled.button`
     transition: all 0.2s;
     
     &:hover {
-        background: rgba(255, 255, 255, 0.4);
+        background: rgba(235, 87, 87, 0.8); /* Vermelho ao passar o mouse para indicar fechar */
         transform: scale(1.1);
+    }
+
+    @media (max-width: 768px) {
+        top: 10px;
+        right: 10px;
+        background: white;
+        color: #333;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        position: fixed; /* Fixa na tela em mobile */
     }
 `;

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ModernSidebarTemplate } from '../../../src/components/ResumeTemplates/ModernSidebarTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -30,10 +30,12 @@ const mockData: ResumeData = {
             graduationDate: '05/2018'
         }
     ],
-    skills: [
+    schooling: [],
+    courses: [
         {
-            name: 'Photoshop',
-            level: 'Especialista'
+            name: 'Photoshop Masterclass',
+            institution: 'Adobe',
+            duration: '20h'
         }
     ],
     selectedTemplate: 2
@@ -70,11 +72,9 @@ describe('ModernSidebarTemplate', () => {
         expect(screen.getByText(/Graphic Design/)).toBeInTheDocument();
     });
 
-    it('renders skills with progress bars', () => {
+    it('renders courses correctly', () => {
         render(<ModernSidebarTemplate data={mockData} />);
         
-        expect(screen.getByText('Photoshop')).toBeInTheDocument();
-        // We can't easily test the width of the progress bar without checking styles directly
-        // but we can ensure the skill name is present
+        expect(screen.getByText('Photoshop Masterclass')).toBeInTheDocument();
     });
 });

@@ -81,21 +81,6 @@ const Description = styled.p`
     color: #000;
 `;
 
-const SkillsList = styled.div`
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-`;
-
-const SkillTag = styled.span`
-    background: #eee;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #000;
-    font-weight: 500;
-`;
-
 const formatDate = (dateString: string) => {
     if (!dateString) return "";
     if (dateString.match(/^\d{2}\/\d{4}$/)) return dateString;
@@ -128,41 +113,66 @@ export const ClassicTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                 <Description>{data.summary}</Description>
             </Section>
 
-            <Section>
-                <SectionTitle>Experiência</SectionTitle>
-                {data.experience.map((exp: any, index: any) => (
-                    <Item key={index}>
-                        <ItemHeader>
-                            <ItemTitle>{exp.position}</ItemTitle>
-                            <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
-                        </ItemHeader>
-                        <ItemSubtitle>{exp.company}</ItemSubtitle>
-                        <Description>{exp.description}</Description>
-                    </Item>
-                ))}
-            </Section>
-
-            <Section>
-                <SectionTitle>Educação</SectionTitle>
-                {data.education.map((edu: any, index: any) => (
-                    <Item key={index}>
-                        <ItemHeader>
-                            <ItemTitle>{edu.institution}</ItemTitle>
-                            <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
-                        </ItemHeader>
-                        <ItemSubtitle>{edu.degree} em {edu.fieldOfStudy}</ItemSubtitle>
-                    </Item>
-                ))}
-            </Section>
-
-            <Section>
-                <SectionTitle>Habilidades</SectionTitle>
-                <SkillsList>
-                    {data.skills.map((skill: any, index: any) => (
-                        <SkillTag key={index}>{skill.name} ({skill.level})</SkillTag>
+            {data.experience && data.experience.length > 0 && (
+                <Section>
+                    <SectionTitle>Experiência</SectionTitle>
+                    {data.experience.map((exp: any, index: any) => (
+                        <Item key={index}>
+                            <ItemHeader>
+                                <ItemTitle>{exp.position}</ItemTitle>
+                                <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
+                            </ItemHeader>
+                            <ItemSubtitle>{exp.company}</ItemSubtitle>
+                            <Description>{exp.description}</Description>
+                        </Item>
                     ))}
-                </SkillsList>
-            </Section>
+                </Section>
+            )}
+
+            {data.education && data.education.length > 0 && (
+                <Section>
+                    <SectionTitle>Formação Acadêmica</SectionTitle>
+                    {data.education.map((edu: any, index: any) => (
+                        <Item key={index}>
+                            <ItemHeader>
+                                <ItemTitle>{edu.institution}</ItemTitle>
+                                <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
+                            </ItemHeader>
+                            <ItemSubtitle>{edu.degree} em {edu.fieldOfStudy}</ItemSubtitle>
+                        </Item>
+                    ))}
+                </Section>
+            )}
+
+            {data.schooling && data.schooling.length > 0 && (
+                <Section>
+                    <SectionTitle>Escolaridade</SectionTitle>
+                    {data.schooling.map((sch: any, index: any) => (
+                        <Item key={index}>
+                            <ItemHeader>
+                                <ItemTitle>{sch.institution}</ItemTitle>
+                                <Date>{sch.completionDate ? formatDate(sch.completionDate) : ""}</Date>
+                            </ItemHeader>
+                            <ItemSubtitle>{sch.degree}</ItemSubtitle>
+                        </Item>
+                    ))}
+                </Section>
+            )}
+
+            {data.courses && data.courses.length > 0 && (
+                <Section>
+                    <SectionTitle>Cursos Complementares</SectionTitle>
+                    {data.courses.map((course: any, index: any) => (
+                        <Item key={index}>
+                            <ItemHeader>
+                                <ItemTitle>{course.name}</ItemTitle>
+                                {course.duration && <Date>{course.duration}</Date>}
+                            </ItemHeader>
+                            <ItemSubtitle>{course.institution}</ItemSubtitle>
+                        </Item>
+                    ))}
+                </Section>
+            )}
         </Container>
     );
 };

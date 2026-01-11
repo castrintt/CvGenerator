@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Select, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
+import {CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
 import type {FormScreenComponentProps} from "./FormScreen.types.ts";
@@ -15,33 +15,40 @@ import type {ResumeData} from "../../../business/domain/models/curriculum.model.
 
 const FAKE_DATA: ResumeData = {
     personalInfo: {
-        fullName: "João Silva",
-        email: "joao@email.com",
-        phone: "(11) 99999-9999",
-        address: "São Paulo, SP",
-        linkedin: "linkedin.com/in/joaosilva"
+        fullName: "Maria Oliveira",
+        email: "maria.oliveira@email.com",
+        phone: "(11) 98765-4321",
+        address: "Rio de Janeiro, RJ",
+        linkedin: "linkedin.com/in/mariaoliveira"
     },
-    summary: "Profissional dedicado com experiência em desenvolvimento de software...",
+    summary: "Profissional organizada e proativa com experiência em atendimento ao cliente e gestão administrativa. Busco oportunidades para aplicar minhas habilidades de comunicação e resolução de problemas.",
     experience: [
         {
-            company: "Tech Solutions",
-            position: "Desenvolvedor Senior",
-            startDate: "2020-01",
-            endDate: "2023-01",
-            description: "Liderança técnica de equipe..."
+            company: "Comércio & Cia",
+            position: "Assistente Administrativo",
+            startDate: "2019-03",
+            endDate: "2022-05",
+            description: "Responsável pelo atendimento ao cliente, organização de arquivos e suporte à gerência."
         }
     ],
     education: [
         {
-            institution: "Universidade de São Paulo",
+            institution: "Universidade Federal",
             degree: "Bacharelado",
-            fieldOfStudy: "Ciência da Computação",
-            graduationDate: "2019-12"
+            fieldOfStudy: "Administração",
+            graduationDate: "2018-12"
         }
     ],
-    skills: [
-        {name: "React", level: "Avançado"},
-        {name: "Node.js", level: "Intermediário"}
+    schooling: [
+        {
+            institution: "Escola Estadual",
+            degree: "Ensino Médio Completo",
+            completionDate: "2014-12"
+        }
+    ],
+    courses: [
+        {name: "Excel Avançado", institution: "Curso Online", duration: "40h"},
+        {name: "Inglês Intermediário", institution: "Escola de Idiomas", duration: "2 anos"}
     ],
     selectedTemplate: 1
 };
@@ -80,29 +87,24 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
         const handleResize = () => {
             if (!previewTemplateId) return;
             
-            // A4 dimensions in mm
             const a4HeightMm = 297;
             const a4WidthMm = 210;
             
-            // Convert mm to px (approximate 96 DPI)
             const a4HeightPx = (a4HeightMm * 96) / 25.4;
             const a4WidthPx = (a4WidthMm * 96) / 25.4;
             
-            // Get viewport dimensions with some padding
-            const vh = window.innerHeight - 80; // 40px padding top/bottom
-            const vw = window.innerWidth - 80;  // 40px padding left/right
+            const vh = window.innerHeight - 80;
+            const vw = window.innerWidth - 80;
             
-            // Calculate scale to fit
             const scaleHeight = vh / a4HeightPx;
             const scaleWidth = vw / a4WidthPx;
             
-            // Use the smaller scale to ensure it fits both dimensions
-            const newScale = Math.min(scaleHeight, scaleWidth, 1); // Max scale 1
+            const newScale = Math.min(scaleHeight, scaleWidth, 1);
             setScale(newScale);
         };
 
         window.addEventListener('resize', handleResize);
-        handleResize(); // Initial calculation
+        handleResize();
 
         return () => window.removeEventListener('resize', handleResize);
     }, [previewTemplateId]);
@@ -139,13 +141,17 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                           onClick={() => controller.actions.scrollToSection('education')}>
                         <span>4</span> Formação
                     </Step>
-                    <Step $active={controller.states.activeSection === 'skills'}
-                          onClick={() => controller.actions.scrollToSection('skills')}>
-                        <span>5</span> Habilidades
+                    <Step $active={controller.states.activeSection === 'schooling'}
+                          onClick={() => controller.actions.scrollToSection('schooling')}>
+                        <span>5</span> Escolaridade
+                    </Step>
+                    <Step $active={controller.states.activeSection === 'courses'}
+                          onClick={() => controller.actions.scrollToSection('courses')}>
+                        <span>6</span> Cursos
                     </Step>
                     <Step $active={controller.states.activeSection === 'template'}
                           onClick={() => controller.actions.scrollToSection('template')}>
-                        <span>6</span> Modelo
+                        <span>7</span> Modelo
                     </Step>
                 </StepIndicator>
             </Sidebar>
@@ -165,9 +171,9 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                         <Title>Informações Pessoais</Title>
                         <Row>
                             <Input label="Nome Completo"
-                                   placeholder="Ex: João Silva" {...controller.actions.register('personalInfo.fullName')}
+                                   placeholder="Ex: Maria Oliveira" {...controller.actions.register('personalInfo.fullName')}
                                    error={controller.states.errors.personalInfo?.fullName?.message}/>
-                            <Input label="E-mail" placeholder="Ex: joao@email.com"
+                            <Input label="E-mail" placeholder="Ex: maria@email.com"
                                    type="email" {...controller.actions.register('personalInfo.email')}
                                    error={controller.states.errors.personalInfo?.email?.message}/>
                         </Row>
@@ -180,12 +186,12 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                 error={controller.states.errors.personalInfo?.phone?.message}
                             />
                             <Input label="Endereço"
-                                   placeholder="Ex: São Paulo, SP" {...controller.actions.register('personalInfo.address')}
+                                   placeholder="Ex: Rio de Janeiro, RJ" {...controller.actions.register('personalInfo.address')}
                                    error={controller.states.errors.personalInfo?.address?.message}/>
                         </Row>
                         <Row>
                             <Input label="LinkedIn (Opcional)"
-                                   placeholder="linkedin.com/in/joaosilva" {...controller.actions.register('personalInfo.linkedin')} />
+                                   placeholder="linkedin.com/in/mariaoliveira" {...controller.actions.register('personalInfo.linkedin')} />
                             <Input label="Site (Opcional)"
                                    placeholder="seusite.com" {...controller.actions.register('personalInfo.website')} />
                         </Row>
@@ -196,7 +202,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     <Section id="summary">
                         <Title>Resumo Profissional</Title>
                         <TextArea
-                            placeholder="Escreva um breve resumo sobre sua trajetória profissional, destacando suas principais conquistas e objetivos..."
+                            placeholder="Escreva um breve resumo sobre sua trajetória profissional, destacando suas principais qualidades e objetivos..."
                             {...controller.actions.register('summary')}
                         />
                         {controller.states.errors.summary &&
@@ -207,7 +213,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     <Divider/>
 
                     <Section id="experience">
-                        <Title>Experiência Profissional</Title>
+                        <Title>Experiência Profissional (Opcional)</Title>
                         {controller.states.experienceFields.map((field, index) => {
                             const isCurrent = controller.actions.watch(`experience.${index}.isCurrent`);
                             return (
@@ -218,10 +224,10 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                     </RemoveButton>
                                     <Row>
                                         <Input label="Empresa"
-                                               placeholder="Ex: Google" {...controller.actions.register(`experience.${index}.company`)}
+                                               placeholder="Ex: Supermercado ABC" {...controller.actions.register(`experience.${index}.company`)}
                                                error={controller.states.errors.experience?.[index]?.company?.message}/>
                                         <Input label="Cargo"
-                                               placeholder="Ex: Engenheiro de Software" {...controller.actions.register(`experience.${index}.position`)}
+                                               placeholder="Ex: Vendedor" {...controller.actions.register(`experience.${index}.position`)}
                                                error={controller.states.errors.experience?.[index]?.position?.message}/>
                                     </Row>
                                     <Row>
@@ -255,7 +261,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                         </div>
                                     </Row>
                                     <TextArea
-                                        placeholder="Descreva suas principais responsabilidades e conquistas..."
+                                        placeholder="Descreva suas principais responsabilidades..."
                                         style={{marginBottom: 0, minHeight: '100px'}}
                                         {...controller.actions.register(`experience.${index}.description`)}
                                     />
@@ -274,7 +280,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     <Divider/>
 
                     <Section id="education">
-                        <Title>Formação Acadêmica</Title>
+                        <Title>Formação Acadêmica (Faculdade/Universidade) (Opcional)</Title>
                         {controller.states.educationFields.map((field, index) => {
                             const isStudying = controller.actions.watch(`education.${index}.isStudying`);
                             return (
@@ -285,7 +291,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                     </RemoveButton>
                                     <Row>
                                         <Input label="Instituição"
-                                               placeholder="Ex: USP" {...controller.actions.register(`education.${index}.institution`)}
+                                               placeholder="Ex: Universidade Federal" {...controller.actions.register(`education.${index}.institution`)}
                                                error={controller.states.errors.education?.[index]?.institution?.message}/>
                                         <Input label="Grau"
                                                placeholder="Ex: Bacharelado" {...controller.actions.register(`education.${index}.degree`)}
@@ -293,7 +299,7 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                     </Row>
                                     <Row>
                                         <Input label="Área de Estudo"
-                                               placeholder="Ex: Ciência da Computação" {...controller.actions.register(`education.${index}.fieldOfStudy`)}
+                                               placeholder="Ex: Administração" {...controller.actions.register(`education.${index}.fieldOfStudy`)}
                                                error={controller.states.errors.education?.[index]?.fieldOfStudy?.message}/>
 
                                         <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
@@ -329,36 +335,63 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
 
                     <Divider/>
 
-                    <Section id="skills">
-                        <Title>Habilidades</Title>
-                        {controller.states.skillFields.map((field, index) => (
-                            <div key={field.id}
-                                 style={{marginBottom: '16px', display: 'flex', gap: '16px', alignItems: 'flex-start'}}>
-                                <div style={{flex: 2}}>
-                                    <Input label="Habilidade"
-                                           placeholder="Ex: React" {...controller.actions.register(`skills.${index}.name`)}
-                                           error={controller.states.errors.skills?.[index]?.name?.message}/>
-                                </div>
-                                <div style={{flex: 1}}>
-                                    <label
-                                        style={{display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: 500}}>Nível</label>
-                                    <Select {...controller.actions.register(`skills.${index}.level`)}>
-                                        <option value="Iniciante">Iniciante</option>
-                                        <option value="Intermediário">Intermediário</option>
-                                        <option value="Avançado">Avançado</option>
-                                        <option value="Especialista">Especialista</option>
-                                    </Select>
-                                </div>
-                                <Button type="button" variant="outline"
-                                        onClick={() => controller.actions.removeSkill(index)}
-                                        style={{marginTop: '28px', padding: '10px 16px', borderColor: '#EB5757', color: '#EB5757'}}>
-                                    ✕
-                                </Button>
-                            </div>
+                    <Section id="schooling">
+                        <Title>Escolaridade (Ensino Médio/Fundamental) (Opcional)</Title>
+                        {controller.states.schoolingFields.map((field, index) => (
+                            <ExperienceCard key={field.id}>
+                                <RemoveButton type="button" onClick={() => controller.actions.removeSchooling(index)}>
+                                    Remover
+                                </RemoveButton>
+                                <Row>
+                                    <Input label="Instituição"
+                                           placeholder="Ex: Escola Estadual..." {...controller.actions.register(`schooling.${index}.institution`)}
+                                           error={controller.states.errors.schooling?.[index]?.institution?.message}/>
+                                    <Input label="Grau/Nível"
+                                           placeholder="Ex: Ensino Médio Completo" {...controller.actions.register(`schooling.${index}.degree`)}
+                                           error={controller.states.errors.schooling?.[index]?.degree?.message}/>
+                                </Row>
+                                <Row>
+                                    <Input label="Data de Conclusão (MM/AAAA)"
+                                           placeholder="MM/AAAA"
+                                           {...controller.actions.register(`schooling.${index}.completionDate`)}
+                                           onChange={(e) => controller.actions.handleDateChange(e, `schooling.${index}.completionDate`)}
+                                           error={controller.states.errors.schooling?.[index]?.completionDate?.message}/>
+                                </Row>
+                            </ExperienceCard>
                         ))}
                         <Button type="button" variant="outline" fullWidth
-                                onClick={() => controller.actions.appendSkill({name: '', level: 'Intermediário'})}>
-                            + Adicionar Habilidade
+                                onClick={() => controller.actions.appendSchooling({institution: '', degree: '', completionDate: ''})}>
+                            + Adicionar Escolaridade
+                        </Button>
+                    </Section>
+
+                    <Divider/>
+
+                    <Section id="courses">
+                        <Title>Cursos Complementares (Opcional)</Title>
+                        {controller.states.courseFields.map((field, index) => (
+                            <ExperienceCard key={field.id}>
+                                <RemoveButton type="button" onClick={() => controller.actions.removeCourse(index)}>
+                                    Remover
+                                </RemoveButton>
+                                <Row>
+                                    <Input label="Nome do Curso"
+                                           placeholder="Ex: Excel Avançado" {...controller.actions.register(`courses.${index}.name`)}
+                                           error={controller.states.errors.courses?.[index]?.name?.message}/>
+                                    <Input label="Instituição"
+                                           placeholder="Ex: Udemy" {...controller.actions.register(`courses.${index}.institution`)}
+                                           error={controller.states.errors.courses?.[index]?.institution?.message}/>
+                                </Row>
+                                <Row>
+                                    <Input label="Carga Horária (Opcional)"
+                                           placeholder="Ex: 40h" {...controller.actions.register(`courses.${index}.duration`)}
+                                           error={controller.states.errors.courses?.[index]?.duration?.message}/>
+                                </Row>
+                            </ExperienceCard>
+                        ))}
+                        <Button type="button" variant="outline" fullWidth
+                                onClick={() => controller.actions.appendCourse({name: '', institution: '', duration: ''})}>
+                            + Adicionar Curso
                         </Button>
                     </Section>
 

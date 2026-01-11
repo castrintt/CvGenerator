@@ -104,40 +104,66 @@ export const TechTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
                 </CodeBlock>
             </Section>
 
-            <Section>
-                <SectionTitle>function experience()</SectionTitle>
-                {data.experience.map((exp, index) => (
-                    <CodeBlock key={index}>
-                        <Comment>// {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Present"}</Comment>
-                        <div>
-                            <Keyword>const</Keyword> <Variable>job</Variable> = {'{'}
-                        </div>
-                        <div style={{paddingLeft: '20px'}}>
-                            role: <String>"{exp.position}"</String>,
-                        </div>
-                        <div style={{paddingLeft: '20px'}}>
-                            company: <String>"{exp.company}"</String>,
-                        </div>
-                        <div style={{paddingLeft: '20px'}}>
-                            description: <String>"{exp.description}"</String>
-                        </div>
-                        <div>{'}'};</div>
-                    </CodeBlock>
-                ))}
-            </Section>
-
-            <Section>
-                <SectionTitle>const skills = [...]</SectionTitle>
-                <CodeBlock>
-                    [
-                    {data.skills.map((skill, index) => (
-                        <span key={index}>
-                            <String>"{skill.name}"</String>{index < data.skills.length - 1 ? ', ' : ''}
-                        </span>
+            {data.experience && data.experience.length > 0 && (
+                <Section>
+                    <SectionTitle>function experience()</SectionTitle>
+                    {data.experience.map((exp, index) => (
+                        <CodeBlock key={index}>
+                            <Comment>// {formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Present"}</Comment>
+                            <div>
+                                <Keyword>const</Keyword> <Variable>job</Variable> = {'{'}
+                            </div>
+                            <div style={{paddingLeft: '20px'}}>
+                                role: <String>"{exp.position}"</String>,
+                            </div>
+                            <div style={{paddingLeft: '20px'}}>
+                                company: <String>"{exp.company}"</String>,
+                            </div>
+                            <div style={{paddingLeft: '20px'}}>
+                                description: <String>"{exp.description}"</String>
+                            </div>
+                            <div>{'}'};</div>
+                        </CodeBlock>
                     ))}
-                    ]
-                </CodeBlock>
-            </Section>
+                </Section>
+            )}
+
+            {data.education && data.education.length > 0 && (
+                <Section>
+                    <SectionTitle>const education = [...]</SectionTitle>
+                    {data.education.map((edu, index) => (
+                        <CodeBlock key={index}>
+                            <div>{'{'}</div>
+                            <div style={{paddingLeft: '20px'}}>
+                                institution: <String>"{edu.institution}"</String>,
+                            </div>
+                            <div style={{paddingLeft: '20px'}}>
+                                degree: <String>"{edu.degree}"</String>,
+                            </div>
+                            <div style={{paddingLeft: '20px'}}>
+                                field: <String>"{edu.fieldOfStudy}"</String>
+                            </div>
+                            <div>{'}'},</div>
+                        </CodeBlock>
+                    ))}
+                </Section>
+            )}
+
+            {data.courses && data.courses.length > 0 && (
+                <Section>
+                    <SectionTitle>const courses = [...]</SectionTitle>
+                    <CodeBlock>
+                        [
+                        {data.courses.map((course, index) => (
+                            <div key={index} style={{paddingLeft: '20px'}}>
+                                <String>"{course.name}"</String> <Comment>// {course.institution}</Comment>
+                                {index < data.courses.length - 1 ? ',' : ''}
+                            </div>
+                        ))}
+                        ]
+                    </CodeBlock>
+                </Section>
+            )}
         </Container>
     );
 };

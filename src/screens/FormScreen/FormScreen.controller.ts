@@ -24,8 +24,9 @@ export const UseFormScreenController = () => {
         mode: 'onChange',
         defaultValues: {
             experience: [{company: '', position: '', startDate: '', endDate: '', description: '', isCurrent: false}],
-            education: [{institution: '', degree: '', fieldOfStudy: '', graduationDate: '', isStudying: false}],
-            skills: [{name: '', level: 'Iniciante'}],
+            education: [], // Opcional, começa vazio
+            schooling: [], // Opcional, começa vazio
+            courses: [], // Opcional, começa vazio
             selectedTemplate: 1
         }
     });
@@ -40,13 +41,18 @@ export const UseFormScreenController = () => {
         name: "education"
     });
 
-    const {fields: skillFields, append: appendSkill, remove: removeSkill} = useFieldArray({
+    const {fields: schoolingFields, append: appendSchooling, remove: removeSchooling} = useFieldArray({
         control,
-        name: "skills"
+        name: "schooling"
+    });
+
+    const {fields: courseFields, append: appendCourse, remove: removeCourse} = useFieldArray({
+        control,
+        name: "courses"
     });
 
     const onSubmit = (data: FormData) => {
-        setResumeData(data)
+        setResumeData(data as any) // Cast necessário pois o tipo do contexto pode estar desatualizado temporariamente
         navigate('/generating');
     };
 
@@ -107,7 +113,8 @@ export const UseFormScreenController = () => {
                 'summary',
                 'experience',
                 'education',
-                'skills',
+                'schooling',
+                'courses',
                 'template'
             ];
             let current = 'personal';
@@ -137,8 +144,10 @@ export const UseFormScreenController = () => {
             removeExperience,
             appendEducation,
             removeEducation,
-            appendSkill,
-            removeSkill,
+            appendSchooling,
+            removeSchooling,
+            appendCourse,
+            removeCourse,
             scrollToSection,
             setTemplate: (id: number) => setValue('selectedTemplate', id),
             watch,
@@ -151,7 +160,8 @@ export const UseFormScreenController = () => {
             activeSection,
             experienceFields,
             educationFields,
-            skillFields,
+            schoolingFields,
+            courseFields,
             selectedTemplate
         }
     };

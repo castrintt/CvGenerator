@@ -100,16 +100,11 @@ const Description = styled.p`
     margin: 0;
 `;
 
-const SkillTag = styled.span`
-    display: inline-block;
-    background-color: #dfe6e9;
-    color: #2d3436;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 12px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-    font-weight: 500;
+const CourseItem = styled.div`
+    margin-bottom: 10px;
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-left: 3px solid #6c5ce7;
 `;
 
 const formatDate = (dateString: string) => {
@@ -126,7 +121,7 @@ const formatDate = (dateString: string) => {
 };
 
 export const CreativeTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
-    const currentTitle = data.experience.length > 0 ? data.experience[0].position : '';
+    const currentTitle = data.experience && data.experience.length > 0 ? data.experience[0].position : '';
 
     return (
         <Container>
@@ -150,39 +145,67 @@ export const CreativeTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
 
             <Grid>
                 <div>
-                    <SectionTitle>Experiência</SectionTitle>
-                    {data.experience.map((exp, index) => (
-                        <ExperienceItem key={index}>
-                            <JobHeader>
-                                <JobTitle>{exp.position}</JobTitle>
-                                <JobDate>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</JobDate>
-                            </JobHeader>
-                            <Company>{exp.company}</Company>
-                            <Description>{exp.description}</Description>
-                        </ExperienceItem>
-                    ))}
+                    {data.experience && data.experience.length > 0 && (
+                        <>
+                            <SectionTitle>Experiência</SectionTitle>
+                            {data.experience.map((exp, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobHeader>
+                                        <JobTitle>{exp.position}</JobTitle>
+                                        <JobDate>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</JobDate>
+                                    </JobHeader>
+                                    <Company>{exp.company}</Company>
+                                    <Description>{exp.description}</Description>
+                                </ExperienceItem>
+                            ))}
+                        </>
+                    )}
                 </div>
 
                 <div>
-                    <SectionTitle>Educação</SectionTitle>
-                    {data.education.map((edu, index) => (
-                        <ExperienceItem key={index}>
-                            <JobHeader>
-                                <JobTitle>{edu.institution}</JobTitle>
-                                <JobDate>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</JobDate>
-                            </JobHeader>
-                            <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
-                        </ExperienceItem>
-                    ))}
+                    {data.education && data.education.length > 0 && (
+                        <>
+                            <SectionTitle>Educação</SectionTitle>
+                            {data.education.map((edu, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobHeader>
+                                        <JobTitle>{edu.institution}</JobTitle>
+                                        <JobDate>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</JobDate>
+                                    </JobHeader>
+                                    <Company>{edu.degree} em {edu.fieldOfStudy}</Company>
+                                </ExperienceItem>
+                            ))}
+                        </>
+                    )}
 
-                    <div style={{marginTop: '30px'}}>
-                        <SectionTitle>Habilidades</SectionTitle>
-                        <div>
-                            {data.skills.map((skill, index) => (
-                                <SkillTag key={index}>{skill.name}</SkillTag>
+                    {data.schooling && data.schooling.length > 0 && (
+                        <div style={{marginTop: '30px'}}>
+                            <SectionTitle>Escolaridade</SectionTitle>
+                            {data.schooling.map((sch, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobHeader>
+                                        <JobTitle>{sch.institution}</JobTitle>
+                                        <JobDate>{sch.completionDate ? formatDate(sch.completionDate) : ""}</JobDate>
+                                    </JobHeader>
+                                    <Company>{sch.degree}</Company>
+                                </ExperienceItem>
                             ))}
                         </div>
-                    </div>
+                    )}
+
+                    {data.courses && data.courses.length > 0 && (
+                        <div style={{marginTop: '30px'}}>
+                            <SectionTitle>Cursos</SectionTitle>
+                            <div>
+                                {data.courses.map((course, index) => (
+                                    <CourseItem key={index}>
+                                        <div style={{fontWeight: 'bold', fontSize: '14px'}}>{course.name}</div>
+                                        <div style={{fontSize: '12px', color: '#666'}}>{course.institution} {course.duration ? `• ${course.duration}` : ''}</div>
+                                    </CourseItem>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Grid>
         </Container>

@@ -92,27 +92,19 @@ const Description = styled.p`
     text-align: justify;
 `;
 
-const SkillItem = styled.div`
+const CourseItem = styled.div`
     margin-bottom: 15px;
 `;
 
-const SkillName = styled.div`
+const CourseName = styled.div`
     font-weight: bold;
     font-size: 14px;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
 `;
 
-const SkillLevel = styled.div`
-    background-color: #ecf0f1;
-    height: 6px;
-    border-radius: 3px;
-    overflow: hidden;
-`;
-
-const SkillFill = styled.div<{ width: string }>`
-    background-color: #3498db;
-    height: 100%;
-    width: ${props => props.width};
+const CourseDetail = styled.div`
+    font-size: 12px;
+    color: #666;
 `;
 
 const formatDate = (dateString: string) => {
@@ -126,16 +118,6 @@ const formatDate = (dateString: string) => {
     }
     
     return dateString;
-};
-
-const getSkillWidth = (level: string) => {
-    switch (level) {
-        case 'Iniciante': return '25%';
-        case 'Intermediário': return '50%';
-        case 'Avançado': return '75%';
-        case 'Especialista': return '100%';
-        default: return '50%';
-    }
 };
 
 export const ProfessionalTemplate: React.FC<{ data: ResumeData }> = ({data}) => {
@@ -158,43 +140,70 @@ export const ProfessionalTemplate: React.FC<{ data: ResumeData }> = ({data}) => 
                     <SectionTitle>Resumo Profissional</SectionTitle>
                     <Description style={{marginBottom: '30px'}}>{data.summary}</Description>
 
-                    <SectionTitle>Experiência Profissional</SectionTitle>
-                    {data.experience.map((exp, index) => (
-                        <ExperienceItem key={index}>
-                            <JobTitle>{exp.position}</JobTitle>
-                            <CompanyInfo>
-                                <span>{exp.company}</span>
-                                <span>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</span>
-                            </CompanyInfo>
-                            <Description>{exp.description}</Description>
-                        </ExperienceItem>
-                    ))}
+                    {data.experience && data.experience.length > 0 && (
+                        <>
+                            <SectionTitle>Experiência Profissional</SectionTitle>
+                            {data.experience.map((exp, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobTitle>{exp.position}</JobTitle>
+                                    <CompanyInfo>
+                                        <span>{exp.company}</span>
+                                        <span>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</span>
+                                    </CompanyInfo>
+                                    <Description>{exp.description}</Description>
+                                </ExperienceItem>
+                            ))}
+                        </>
+                    )}
                 </LeftColumn>
 
                 <RightColumn>
-                    <SectionTitle>Educação</SectionTitle>
-                    {data.education.map((edu, index) => (
-                        <ExperienceItem key={index}>
-                            <JobTitle>{edu.institution}</JobTitle>
-                            <CompanyInfo style={{flexDirection: 'column'}}>
-                                <span>{edu.degree}</span>
-                                <span style={{fontWeight: 'normal', fontSize: '13px'}}>{edu.fieldOfStudy}</span>
-                                <span style={{fontWeight: 'normal', fontSize: '12px', marginTop: '4px'}}>
-                                    {edu.graduationDate ? `Conclusão: ${formatDate(edu.graduationDate)}` : "Cursando"}
-                                </span>
-                            </CompanyInfo>
-                        </ExperienceItem>
-                    ))}
+                    {data.education && data.education.length > 0 && (
+                        <>
+                            <SectionTitle>Educação</SectionTitle>
+                            {data.education.map((edu, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobTitle>{edu.institution}</JobTitle>
+                                    <CompanyInfo style={{flexDirection: 'column'}}>
+                                        <span>{edu.degree}</span>
+                                        <span style={{fontWeight: 'normal', fontSize: '13px'}}>{edu.fieldOfStudy}</span>
+                                        <span style={{fontWeight: 'normal', fontSize: '12px', marginTop: '4px'}}>
+                                            {edu.graduationDate ? `Conclusão: ${formatDate(edu.graduationDate)}` : "Cursando"}
+                                        </span>
+                                    </CompanyInfo>
+                                </ExperienceItem>
+                            ))}
+                        </>
+                    )}
 
-                    <SectionTitle>Habilidades</SectionTitle>
-                    {data.skills.map((skill, index) => (
-                        <SkillItem key={index}>
-                            <SkillName>{skill.name}</SkillName>
-                            <SkillLevel>
-                                <SkillFill width={getSkillWidth(skill.level)} />
-                            </SkillLevel>
-                        </SkillItem>
-                    ))}
+                    {data.schooling && data.schooling.length > 0 && (
+                        <>
+                            <SectionTitle>Escolaridade</SectionTitle>
+                            {data.schooling.map((sch, index) => (
+                                <ExperienceItem key={index}>
+                                    <JobTitle>{sch.institution}</JobTitle>
+                                    <CompanyInfo style={{flexDirection: 'column'}}>
+                                        <span>{sch.degree}</span>
+                                        <span style={{fontWeight: 'normal', fontSize: '12px', marginTop: '4px'}}>
+                                            {sch.completionDate ? `Conclusão: ${formatDate(sch.completionDate)}` : ""}
+                                        </span>
+                                    </CompanyInfo>
+                                </ExperienceItem>
+                            ))}
+                        </>
+                    )}
+
+                    {data.courses && data.courses.length > 0 && (
+                        <>
+                            <SectionTitle>Cursos</SectionTitle>
+                            {data.courses.map((course, index) => (
+                                <CourseItem key={index}>
+                                    <CourseName>{course.name}</CourseName>
+                                    <CourseDetail>{course.institution} {course.duration ? `• ${course.duration}` : ''}</CourseDetail>
+                                </CourseItem>
+                            ))}
+                        </>
+                    )}
                 </RightColumn>
             </MainContent>
         </Container>

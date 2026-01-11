@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MinimalistTemplate } from '../../../src/components/ResumeTemplates/MinimalistTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -30,10 +30,12 @@ const mockData: ResumeData = {
             graduationDate: '12/2019'
         }
     ],
-    skills: [
+    schooling: [],
+    courses: [
         {
-            name: 'React',
-            level: 'Avançado'
+            name: 'React Course',
+            institution: 'Udemy',
+            duration: '40h'
         }
     ],
     selectedTemplate: 3
@@ -69,10 +71,9 @@ describe('MinimalistTemplate', () => {
         expect(screen.getByText(/Bachelor/)).toBeInTheDocument();
     });
 
-    it('renders skills correctly', () => {
+    it('renders courses correctly', () => {
         render(<MinimalistTemplate data={mockData} />);
         
-        expect(screen.getByText(/React/)).toBeInTheDocument();
-        expect(screen.getByText(/Avançado/)).toBeInTheDocument();
+        expect(screen.getByText('React Course')).toBeInTheDocument();
     });
 });

@@ -95,13 +95,14 @@ const Description = styled.p`
   margin: 0;
 `;
 
-const SkillTag = styled.div`
-    background: #f8f9fa;
-    padding: 8px 12px;
-    margin-bottom: 8px;
-    border-radius: 4px;
-    font-size: 14px;
-    border-left: 3px solid #e74c3c;
+const CourseItem = styled.div`
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    
+    &:last-child {
+        border-bottom: none;
+    }
 `;
 
 const formatDate = (dateString: string) => {
@@ -138,40 +139,60 @@ export const MinimalistTemplate: React.FC<{ data: ResumeData }> = ({ data }) => 
             <Description>{data.summary}</Description>
           </Section>
 
-          <Section>
-            <SectionTitle>Experiência</SectionTitle>
-            {data.experience.map((exp, index) => (
-              <Item key={index}>
-                <ItemTitle>{exp.position}</ItemTitle>
-                <ItemSubtitle>{exp.company}</ItemSubtitle>
-                <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
-                <Description>{exp.description}</Description>
-              </Item>
-            ))}
-          </Section>
+          {data.experience && data.experience.length > 0 && (
+              <Section>
+                <SectionTitle>Experiência</SectionTitle>
+                {data.experience.map((exp, index) => (
+                  <Item key={index}>
+                    <ItemTitle>{exp.position}</ItemTitle>
+                    <ItemSubtitle>{exp.company}</ItemSubtitle>
+                    <Date>{formatDate(exp.startDate)} - {exp.endDate ? formatDate(exp.endDate) : "Atualmente"}</Date>
+                    <Description>{exp.description}</Description>
+                  </Item>
+                ))}
+              </Section>
+          )}
         </LeftColumn>
 
         <RightColumn>
-          <Section>
-            <SectionTitle>Educação</SectionTitle>
-            {data.education.map((edu, index) => (
-              <div key={index} style={{ marginBottom: '20px' }}>
-                <ItemTitle>{edu.institution}</ItemTitle>
-                <ItemSubtitle>{edu.degree}</ItemSubtitle>
-                <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
-              </div>
-            ))}
-          </Section>
+          {data.education && data.education.length > 0 && (
+              <Section>
+                <SectionTitle>Educação</SectionTitle>
+                {data.education.map((edu, index) => (
+                  <div key={index} style={{ marginBottom: '20px' }}>
+                    <ItemTitle>{edu.institution}</ItemTitle>
+                    <ItemSubtitle>{edu.degree}</ItemSubtitle>
+                    <Date>{edu.graduationDate ? formatDate(edu.graduationDate) : "Cursando"}</Date>
+                  </div>
+                ))}
+              </Section>
+          )}
 
-          <Section>
-            <SectionTitle>Habilidades</SectionTitle>
-            {data.skills.map((skill, index) => (
-              <SkillTag key={index}>
-                <strong>{skill.name}</strong>
-                <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>{skill.level}</div>
-              </SkillTag>
-            ))}
-          </Section>
+          {data.schooling && data.schooling.length > 0 && (
+              <Section>
+                <SectionTitle>Escolaridade</SectionTitle>
+                {data.schooling.map((sch, index) => (
+                  <div key={index} style={{ marginBottom: '20px' }}>
+                    <ItemTitle>{sch.institution}</ItemTitle>
+                    <ItemSubtitle>{sch.degree}</ItemSubtitle>
+                    <Date>{sch.completionDate ? formatDate(sch.completionDate) : ""}</Date>
+                  </div>
+                ))}
+              </Section>
+          )}
+
+          {data.courses && data.courses.length > 0 && (
+              <Section>
+                <SectionTitle>Cursos</SectionTitle>
+                {data.courses.map((course, index) => (
+                  <CourseItem key={index}>
+                    <ItemTitle style={{fontSize: '14px'}}>{course.name}</ItemTitle>
+                    <div style={{ fontSize: '12px', color: '#666' }}>{course.institution}</div>
+                    {course.duration && <div style={{ fontSize: '12px', color: '#999' }}>{course.duration}</div>}
+                  </CourseItem>
+                ))}
+              </Section>
+          )}
         </RightColumn>
       </Content>
     </Container>

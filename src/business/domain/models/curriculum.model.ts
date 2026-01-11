@@ -25,14 +25,14 @@ export interface Education {
 
 export interface Schooling {
     institution: string;
-    degree: string; // Ex: Ensino Médio Completo
+    degree: string;
     completionDate?: string;
 }
 
 export interface Course {
     name: string;
     institution: string;
-    duration?: string; // Ex: 40h
+    duration?: string;
 }
 
 export interface ResumeData {
