@@ -374,7 +374,8 @@ export const ModalOverlay = styled.div`
     justify-content: center;
     z-index: 1000;
     padding: 20px;
-    cursor: pointer; /* Indica que é clicável */
+    cursor: pointer;
+    overflow: hidden; /* Garante que nada vaze do overlay */
 `;
 
 export const ModalContent = styled.div`
@@ -386,7 +387,10 @@ export const ModalContent = styled.div`
     box-shadow: none;
     padding: 0;
     position: relative;
-    cursor: default; /* Reseta o cursor dentro do conteúdo */
+    cursor: default;
+    max-width: 100%;
+    max-height: 100%;
+    overflow: auto; /* Permite scroll se necessário, embora o scale deva evitar */
 `;
 
 export const PreviewContainer = styled.div<{ $scale: number }>`
@@ -400,6 +404,13 @@ export const PreviewContainer = styled.div<{ $scale: number }>`
     
     /* Ensure text is black even in dark mode */
     color: black;
+
+    /* Fix para evitar overflow horizontal em mobile */
+    @media (max-width: 768px) {
+        /* Em telas pequenas, garantimos que o container não force a largura */
+        max-width: 90vw; 
+        /* O scale já cuida do tamanho visual, mas o max-width ajuda o navegador a entender os limites */
+    }
 `;
 
 export const CloseButton = styled.button`
@@ -421,7 +432,7 @@ export const CloseButton = styled.button`
     transition: all 0.2s;
     
     &:hover {
-        background: rgba(235, 87, 87, 0.8); /* Vermelho ao passar o mouse para indicar fechar */
+        background: rgba(235, 87, 87, 0.8);
         transform: scale(1.1);
     }
 
@@ -431,6 +442,6 @@ export const CloseButton = styled.button`
         background: white;
         color: #333;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        position: fixed; /* Fixa na tela em mobile */
+        position: fixed;
     }
 `;
