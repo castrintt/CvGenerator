@@ -4,6 +4,10 @@ export const Container = styled.div`
     display: flex;
     min-height: 100vh;
     background-color: var(--background-color);
+
+    @media (max-width: 1024px) {
+        flex-direction: column-reverse;
+    }
 `;
 
 export const Sidebar = styled.div`
@@ -19,6 +23,19 @@ export const Sidebar = styled.div`
     overflow-y: auto;
     z-index: 10;
     border-right: 1px solid var(--border-color);
+
+    @media (max-width: 1024px) {
+        position: relative;
+        width: 100%;
+        height: auto;
+        box-shadow: none;
+        border-right: none;
+        border-top: 1px solid var(--border-color);
+    }
+
+    @media (max-width: 768px) {
+        padding: 24px;
+    }
 `;
 
 export const PreviewArea = styled.div`
@@ -29,6 +46,12 @@ export const PreviewArea = styled.div`
     justify-content: center;
     overflow-y: auto;
     background-color: var(--secondary-color);
+
+    @media (max-width: 1024px) {
+        margin-left: 0;
+        padding: 40px 20px;
+        flex: none;
+    }
 `;
 
 export const ResumePreview = styled.div`
@@ -40,7 +63,22 @@ export const ResumePreview = styled.div`
     box-sizing: border-box;
     transform: scale(0.9);
     transform-origin: top center;
-    color: black; /* Ensure resume content is always black on white */
+    color: black;
+
+    @media (max-width: 1024px) {
+        transform: scale(0.8);
+        margin-bottom: calc(297mm * (0.8 - 1)); /* Puxa o conteúdo de baixo */
+    }
+
+    @media (max-width: 768px) {
+        transform: scale(0.6);
+        margin-bottom: calc(297mm * (0.6 - 1));
+    }
+
+    @media (max-width: 480px) {
+        transform: scale(0.45);
+        margin-bottom: calc(297mm * (0.45 - 1));
+    }
 `;
 
 export const FeedbackForm = styled.form`
