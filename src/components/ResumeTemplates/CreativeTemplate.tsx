@@ -8,6 +8,11 @@ const Container = styled.div`
     color: #333;
     background-color: #fff;
     border-top: 10px solid #6c5ce7;
+    overflow-wrap: break-word;
+    width: 210mm;
+    min-height: 297mm;
+    display: flex;
+    flex-direction: column;
 `;
 
 const Header = styled.header`

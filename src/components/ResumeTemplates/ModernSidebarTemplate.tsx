@@ -4,8 +4,10 @@ import type {ResumeData} from "../../../business/domain/models/curriculum.model.
 
 const Container = styled.div`
     display: flex;
-    height: 100%;
+    width: 210mm;
+    min-height: 297mm;
     font-family: 'Georgia', serif;
+    overflow-wrap: break-word;
 `;
 
 const Sidebar = styled.div`
@@ -22,6 +24,8 @@ const Main = styled.div`
     padding: 40px;
     background-color: white;
     color: #333;
+    display: flex;
+    flex-direction: column;
 `;
 
 const Name = styled.h1`
@@ -29,6 +33,7 @@ const Name = styled.h1`
     margin: 0 0 20px 0;
     line-height: 1.2;
     color: white;
+    word-break: break-word;
 `;
 
 const SidebarSection = styled.div`
@@ -198,6 +203,7 @@ export const ModernSidebarTemplate: React.FC<{ data: ResumeData }> = ({data}) =>
                         ))}
                     </MainSection>
                 )}
+                <div style={{flexGrow: 1}}></div>
             </Main>
         </Container>
     );

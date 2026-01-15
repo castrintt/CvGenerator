@@ -6,9 +6,11 @@ const Container = styled.div`
     font-family: 'Arial', sans-serif;
     color: #333;
     background-color: white;
-    height: 100%;
+    width: 210mm;
+    min-height: 297mm;
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
 `;
 
 const Header = styled.header`

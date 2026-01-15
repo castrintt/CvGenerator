@@ -6,9 +6,13 @@ const Container = styled.div`
     font-family: 'Georgia', serif;
     color: #444;
     background-color: #fffaf0;
-    height: 100%;
+    width: 210mm;
+    min-height: 297mm;
     padding: 50px;
     border: 1px solid #e0e0e0;
+    overflow-wrap: break-word;
+    display: flex;
+    flex-direction: column;
 `;
 
 const Header = styled.header`

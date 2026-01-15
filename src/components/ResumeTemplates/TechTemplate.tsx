@@ -6,10 +6,12 @@ const Container = styled.div`
     font-family: 'Roboto Mono', monospace;
     color: #c9d1d9;
     background-color: #0d1117;
-    height: 100%;
+    width: 210mm;
+    min-height: 297mm;
     padding: 40px;
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
 `;
 
 const Header = styled.header`

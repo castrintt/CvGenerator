@@ -8,8 +8,10 @@ const Container = styled.div`
     color: #000;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    width: 210mm;
+    min-height: 297mm;
     background-color: white;
+    overflow-wrap: break-word;
 `;
 
 const Header = styled.header`

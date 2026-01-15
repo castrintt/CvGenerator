@@ -7,6 +7,11 @@ const Container = styled.div`
     font-family: 'Helvetica', sans-serif;
     color: #000;
     background-color: white;
+    overflow-wrap: break-word;
+    width: 210mm;
+    min-height: 297mm; /* Garante altura mínima, mas permite crescer */
+    display: flex;
+    flex-direction: column;
 `;
 
 const Header = styled.header`

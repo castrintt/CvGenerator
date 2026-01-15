@@ -165,8 +165,7 @@ export const TemplateMiniature = styled.div`
     position: relative;
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    pointer-events: none; /* Prevent interaction with the resume content */
-
+    
     & > div {
         transform: scale(0.28); 
         transform-origin: top left;
@@ -176,7 +175,7 @@ export const TemplateMiniature = styled.div`
         top: 0;
         left: 0;
         background-color: white;
-        color: black; /* Ensure resume is always black on white */
+        color: black;
     }
 `;
 
@@ -242,9 +241,8 @@ export const StepIndicator = styled.div`
         margin-top: 20px;
         gap: 16px;
 
-        /* Hide scrollbar for cleaner look */
-        -ms-overflow-style: none;  /* IE and Edge */
-        scrollbar-width: none;  /* Firefox */
+        -ms-overflow-style: none;
+        scrollbar-width: none;
         &::-webkit-scrollbar {
             display: none;
         }
@@ -375,7 +373,7 @@ export const ModalOverlay = styled.div`
     z-index: 1000;
     padding: 20px;
     cursor: pointer;
-    overflow: hidden; /* Garante que nada vaze do overlay */
+    overflow: hidden;
 `;
 
 export const ModalContent = styled.div`
@@ -390,7 +388,7 @@ export const ModalContent = styled.div`
     cursor: default;
     max-width: 100%;
     max-height: 100%;
-    overflow: auto; /* Permite scroll se necessário, embora o scale deva evitar */
+    overflow: auto;
 `;
 
 export const PreviewContainer = styled.div<{ $scale: number }>`
@@ -402,14 +400,10 @@ export const PreviewContainer = styled.div<{ $scale: number }>`
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s ease;
     
-    /* Ensure text is black even in dark mode */
     color: black;
 
-    /* Fix para evitar overflow horizontal em mobile */
     @media (max-width: 768px) {
-        /* Em telas pequenas, garantimos que o container não force a largura */
-        max-width: 90vw; 
-        /* O scale já cuida do tamanho visual, mas o max-width ajuda o navegador a entender os limites */
+        max-width: 90vw;
     }
 `;
 
@@ -443,5 +437,29 @@ export const CloseButton = styled.button`
         color: #333;
         box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         position: fixed;
+    }
+`;
+
+export const ActionModal = styled.div`
+    background: var(--card-bg);
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    text-align: center;
+    width: 90%;
+    max-width: 320px;
+    z-index: 1001;
+    cursor: default;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+        font-size: 18px;
+    }
+
+    div {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
     }
 `;

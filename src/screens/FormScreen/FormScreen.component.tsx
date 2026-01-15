@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
+import {ActionModal, CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
 import type {FormScreenComponentProps} from "./FormScreen.types.ts";
@@ -81,6 +81,7 @@ const TEMPLATE_NAMES = [
 
 export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({controller}) => {
     const [previewTemplateId, setPreviewTemplateId] = useState<number | null>(null);
+    const [actionModalTemplateId, setActionModalTemplateId] = useState<number | null>(null);
     const [scale, setScale] = useState(1);
 
     useEffect(() => {
@@ -109,9 +110,26 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
         return () => window.removeEventListener('resize', handleResize);
     }, [previewTemplateId]);
 
-    const openPreview = (id: number, e: React.MouseEvent) => {
-        e.stopPropagation();
-        setPreviewTemplateId(id);
+    const openActionModal = (id: number) => {
+        setActionModalTemplateId(id);
+    };
+
+    const closeActionModal = () => {
+        setActionModalTemplateId(null);
+    };
+
+    const handleSelect = () => {
+        if (actionModalTemplateId) {
+            controller.actions.setTemplate(actionModalTemplateId);
+        }
+        closeActionModal();
+    };
+
+    const handlePreview = () => {
+        if (actionModalTemplateId) {
+            setPreviewTemplateId(actionModalTemplateId);
+        }
+        closeActionModal();
     };
 
     const closePreview = () => {
@@ -404,9 +422,9 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                 <TemplateCard
                                     key={template.id}
                                     $selected={controller.states.selectedTemplate === template.id}
-                                    onClick={() => controller.actions.setTemplate(template.id)}
+                                    onClick={() => openActionModal(template.id)}
                                 >
-                                    <TemplateMiniature onClick={(e) => openPreview(template.id, e)} style={{cursor: 'zoom-in', pointerEvents: 'auto'}}>
+                                    <TemplateMiniature>
                                         {RenderTemplatePreview(template.id)}
                                     </TemplateMiniature>
                                     <h3>{template.name}</h3>
@@ -422,6 +440,18 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     </SubmitButtonContainer>
                 </form>
             </MainContent>
+
+            {actionModalTemplateId && (
+                <ModalOverlay onClick={closeActionModal}>
+                    <ActionModal onClick={e => e.stopPropagation()}>
+                        <h3>O que você deseja fazer?</h3>
+                        <div>
+                            <Button onClick={handleSelect}>Selecionar Modelo</Button>
+                            <Button variant="outline" onClick={handlePreview}>Visualizar</Button>
+                        </div>
+                    </ActionModal>
+                </ModalOverlay>
+            )}
 
             {previewTemplateId && (
                 <ModalOverlay onClick={closePreview}>
