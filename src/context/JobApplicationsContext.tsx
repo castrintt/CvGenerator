@@ -1,20 +1,21 @@
 import React, {createContext, ReactNode, useContext, useState, useEffect, useCallback} from 'react';
-import type {JobApplication, JobApplicationSectionId} from '../../business/domain/models/jobApplication.model';
+import type {JobApplication} from '../../business/domain/models/jobApplication.model';
 
 const STORAGE_KEY = 'cvgenerator_job_applications';
 
 function migrateFromLegacy(data: unknown): JobApplication[] {
     if (!Array.isArray(data)) return [];
-    const sectionMap: Record<string, JobApplicationSectionId> = {
+    const sectionMap: Record<string, string> = {
         vagas_candidatadas: 'applied',
         em_processo: 'in_progress',
         devolutivas_positivas: 'positive_feedback',
         negadas: 'rejected',
-        vagas_frias: 'cold',
+        vagas_frias: 'applied',
+        cold: 'applied',
     };
     return data.map((item: Record<string, unknown>) => {
         const legacySection = item.sectionId as string;
-        const sectionId = sectionMap[legacySection] ?? (legacySection as JobApplicationSectionId);
+        const sectionId = sectionMap[legacySection] ?? legacySection;
         return {
             id: String(item.id ?? ''),
             company: String(item.company ?? item.empresa ?? ''),
@@ -29,11 +30,13 @@ function migrateFromLegacy(data: unknown): JobApplication[] {
 
 interface JobApplicationsContextType {
     jobApplications: JobApplication[];
-    addJobApplication: (sectionId: JobApplicationSectionId, data: Omit<JobApplication, 'id' | 'sectionId'>) => JobApplication;
+    addJobApplication: (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => JobApplication;
     updateJobApplication: (id: string, data: Partial<JobApplication>) => void;
-    moveJobApplication: (id: string, newSectionId: JobApplicationSectionId) => void;
+    moveJobApplication: (id: string, newSectionId: string) => void;
+    moveAllFromSection: (fromSectionId: string, toSectionId: string) => void;
     removeJobApplication: (id: string) => void;
-    getBySection: (sectionId: JobApplicationSectionId) => JobApplication[];
+    removeAllFromSection: (sectionId: string) => void;
+    getBySection: (sectionId: string) => JobApplication[];
 }
 
 const JobApplicationsContext = createContext<JobApplicationsContextType | undefined>(undefined);
@@ -62,7 +65,14 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({chil
         }
         try {
             const parsed = JSON.parse(stored);
-            setJobApplications(Array.isArray(parsed) ? parsed : []);
+            const items = Array.isArray(parsed) ? parsed : [];
+            const migrated = items.map((item: JobApplication) =>
+                item.sectionId === 'cold' ? {...item, sectionId: 'applied'} : item
+            );
+            if (migrated.some((item: JobApplication, i: number) => item.sectionId !== items[i]?.sectionId)) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+            }
+            setJobApplications(migrated);
         } catch {
             localStorage.removeItem(STORAGE_KEY);
         }
@@ -73,7 +83,7 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({chil
     }, [jobApplications]);
 
     const addJobApplication = useCallback(
-        (sectionId: JobApplicationSectionId, data: Omit<JobApplication, 'id' | 'sectionId'>) => {
+        (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => {
             const newItem: JobApplication = {
                 ...data,
                 id: generateId(),
@@ -91,9 +101,17 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({chil
         );
     }, []);
 
-    const moveJobApplication = useCallback((id: string, newSectionId: JobApplicationSectionId) => {
+    const moveJobApplication = useCallback((id: string, newSectionId: string) => {
         setJobApplications((prev) =>
             prev.map((item) => (item.id === id ? {...item, sectionId: newSectionId} : item))
+        );
+    }, []);
+
+    const moveAllFromSection = useCallback((fromSectionId: string, toSectionId: string) => {
+        setJobApplications((prev) =>
+            prev.map((item) =>
+                item.sectionId === fromSectionId ? {...item, sectionId: toSectionId} : item
+            )
         );
     }, []);
 
@@ -101,8 +119,12 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({chil
         setJobApplications((prev) => prev.filter((item) => item.id !== id));
     }, []);
 
+    const removeAllFromSection = useCallback((sectionId: string) => {
+        setJobApplications((prev) => prev.filter((item) => item.sectionId !== sectionId));
+    }, []);
+
     const getBySection = useCallback(
-        (sectionId: JobApplicationSectionId) =>
+        (sectionId: string) =>
             jobApplications.filter((item) => item.sectionId === sectionId),
         [jobApplications]
     );
@@ -114,7 +136,9 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({chil
                 addJobApplication,
                 updateJobApplication,
                 moveJobApplication,
+                moveAllFromSection,
                 removeJobApplication,
+                removeAllFromSection,
                 getBySection,
             }}
         >

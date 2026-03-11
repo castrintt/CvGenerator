@@ -13,6 +13,18 @@
   --card-bg: #FAFAFA;
   --button-text: #FFFFFF;
   --button-bg: #000000;
+  --section-applied-bg: #F5F5F5;
+  --section-applied-border: #E5E7EB;
+  --section-in-progress-bg: #FFFBEB;
+  --section-in-progress-border: #FDE68A;
+  --section-positive-bg: #ECFDF5;
+  --section-positive-border: #6EE7B7;
+  --section-rejected-bg: #FEF2F2;
+  --section-rejected-border: #FCA5A5;
+  --section-cold-bg: #F0F9FF;
+  --section-cold-border: #7DD3FC;
+  --section-custom-bg: #F5F5F5;
+  --section-custom-border: #E0E0E0;
 }
 
 [data-theme='dark'] {
@@ -28,6 +40,18 @@
   --card-bg: #1E1E1E;
   --button-text: #000000;
   --button-bg: #FFFFFF;
+  --section-applied-bg: #2C2C2C;
+  --section-applied-border: #4F4F4F;
+  --section-in-progress-bg: #3D3500;
+  --section-in-progress-border: #A16207;
+  --section-positive-bg: #052E16;
+  --section-positive-border: #15803D;
+  --section-rejected-bg: #450A0A;
+  --section-rejected-border: #B91C1C;
+  --section-cold-bg: #0C4A6E;
+  --section-cold-border: #0284C7;
+  --section-custom-bg: #2C2C2C;
+  --section-custom-border: #4F4F4F;
 }
 
 body {

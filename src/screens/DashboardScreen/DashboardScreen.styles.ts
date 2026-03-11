@@ -108,6 +108,22 @@ export const InstructionNotice = styled.div`
     }
 `;
 
+export const ScrollNotice = styled.div`
+    background: var(--secondary-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-bottom: 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+
+    @media (max-width: 480px) {
+        padding: 8px 14px;
+        font-size: 12px;
+    }
+`;
+
 export const Board = styled.div`
     display: flex;
     gap: 24px;
@@ -135,15 +151,34 @@ export const Board = styled.div`
     }
 `;
 
-export const Column = styled.div<{ $isOver?: boolean }>`
+const sectionBgVar: Record<string, string> = {
+    applied: 'var(--section-applied-bg)',
+    in_progress: 'var(--section-in-progress-bg)',
+    positive_feedback: 'var(--section-positive-bg)',
+    rejected: 'var(--section-rejected-bg)',
+    custom: 'var(--section-custom-bg)',
+};
+
+const sectionBorderVar: Record<string, string> = {
+    applied: 'var(--section-applied-border)',
+    in_progress: 'var(--section-in-progress-border)',
+    positive_feedback: 'var(--section-positive-border)',
+    rejected: 'var(--section-rejected-border)',
+    custom: 'var(--section-custom-border)',
+};
+
+export const Column = styled.div<{ $isOver?: boolean; $colorKey?: string }>`
     flex: 0 0 280px;
-    background: var(--card-bg);
-    border: 2px dashed ${(p) => (p.$isOver ? 'var(--accent-color)' : 'var(--border-color)')};
+    background: ${(p) => (p.$colorKey ? sectionBgVar[p.$colorKey] ?? 'var(--card-bg)' : 'var(--card-bg)')};
+    border: 2px dashed ${(p) => {
+        if (p.$isOver) return 'var(--accent-color)';
+        return p.$colorKey ? (sectionBorderVar[p.$colorKey] ?? 'var(--border-color)') : 'var(--border-color)';
+    }};
     border-radius: 12px;
     padding: 16px;
     min-height: 200px;
     transition: border-color 0.2s, background 0.2s;
-    ${(p) => p.$isOver && 'background: rgba(45, 156, 219, 0.05);'}
+    ${(p) => p.$isOver && 'background: rgba(45, 156, 219, 0.15) !important;'}
 
     @media (max-width: 480px) {
         flex: 0 0 260px;
@@ -223,9 +258,9 @@ export const DragOverlayCard = styled.div`
     }
 `;
 
-export const Card = styled.div<{ $isDragging?: boolean }>`
-    background: var(--input-bg);
-    border: 1px solid var(--border-color);
+export const Card = styled.div<{ $isDragging?: boolean; $colorKey?: string }>`
+    background: ${(p) => (p.$colorKey ? sectionBgVar[p.$colorKey] ?? 'var(--input-bg)' : 'var(--input-bg)')};
+    border: 1px solid ${(p) => (p.$colorKey ? sectionBorderVar[p.$colorKey] ?? 'var(--border-color)' : 'var(--border-color)')};
     border-radius: 8px;
     padding: 12px;
     cursor: grab;
@@ -283,6 +318,70 @@ export const CardActions = styled.div`
             padding: 10px;
             min-height: 44px;
         }
+    }
+`;
+
+export const HeaderActions = styled.div`
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+`;
+
+export const SortableSection = styled.div<{ $isDragging?: boolean }>`
+    flex: 0 0 280px;
+    opacity: ${(p) => (p.$isDragging ? 0.7 : 1)};
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    @media (max-width: 480px) {
+        flex: 0 0 260px;
+    }
+`;
+
+export const SectionEditHeader = styled.div`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        flex: 1;
+    }
+`;
+
+export const SectionEditActions = styled.div`
+    display: flex;
+    gap: 4px;
+
+    button {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 6px;
+        font-size: 14px;
+        border-radius: 4px;
+
+        &:hover {
+            background: var(--secondary-color);
+            color: var(--text-primary);
+        }
+    }
+`;
+
+export const SectionDeleteBtn = styled.button`
+    color: #EB5757 !important;
+
+    &:hover {
+        color: #EB5757 !important;
+        background: rgba(235, 87, 87, 0.1) !important;
     }
 `;
 
@@ -348,6 +447,48 @@ export const ModalActions = styled.div`
     button {
         min-height: 44px;
     }
+`;
+
+export const DeleteModalContent = styled(ModalContent)`
+    text-align: center;
+
+    h3 {
+        text-align: center;
+    }
+`;
+
+export const DeleteModalActions = styled(ModalActions)`
+    justify-content: center;
+`;
+
+export const DeleteModalBody = styled.div`
+    color: var(--text-primary);
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+
+    p {
+        margin: 0 0 12px 0;
+    }
+
+    p:last-of-type {
+        margin-bottom: 0;
+    }
+`;
+
+export const DeleteModalWarning = styled.p`
+    color: var(--text-secondary);
+`;
+
+export const DeleteModalSectionName = styled.strong`
+    color: var(--accent-color);
+    font-weight: 600;
+`;
+
+export const DeleteModalConfirm = styled.p`
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 16px !important;
 `;
 
 export const FormRow = styled.div`
