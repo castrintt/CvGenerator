@@ -14,7 +14,7 @@ export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInj
 
     useEffect(() => {
         if (!resumeData) {
-            navigate('/');
+            navigate('/resume');
         }
     }, [resumeData, navigate]);
 
@@ -61,12 +61,15 @@ export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInj
         await resumeService.generateImage('resume-preview', downloadFormat);
     }
 
+    const goToCreateAnother = () => navigate('/resume');
+
     return {
         actions: {
             register,
             handleSubmit: handleSubmit(onSubmit),
             setDownloadFormat,
-            handleDownload
+            handleDownload,
+            goToCreateAnother,
         },
         states: {
             errors,

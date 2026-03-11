@@ -22,6 +22,7 @@ export type FeedbackScreenComponentProps = {
             handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
             setDownloadFormat: (format: 'pdf' | 'png' | 'jpeg') => void;
             handleDownload: () => void;
+            goToCreateAnother: () => void;
         };
         states: {
             errors: any;

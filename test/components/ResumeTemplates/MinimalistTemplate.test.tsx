@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MinimalistTemplate } from '../../../src/components/ResumeTemplates/MinimalistTemplate';
-import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
+import { ResumeData } from '../../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {

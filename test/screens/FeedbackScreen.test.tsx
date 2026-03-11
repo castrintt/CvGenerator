@@ -4,11 +4,11 @@ import { FeedbackScreen } from '../../src/screens/FeedbackScreen/FeedbackScreen'
 import { ResumeProvider, useResumeContext } from '../../src/context/ResumeContext';
 import { ThemeProvider } from '../../src/context/ThemeContext';
 import { BrowserRouter } from 'react-router-dom';
-import { ResumeData } from '../../src/business/domain/models/curriculum.model';
+import { ResumeData } from '../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 // Mock ResumeService
-jest.mock('../../src/business/service/Resume.service.ts', () => {
+jest.mock('../../business/service/Resume.service.ts', () => {
     return {
         ResumeService: jest.fn().mockImplementation(() => ({
             generatePDF: jest.fn(),

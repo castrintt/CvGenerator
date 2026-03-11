@@ -24,9 +24,9 @@ export const UseFormScreenController = () => {
         mode: 'onChange',
         defaultValues: {
             experience: [{company: '', position: '', startDate: '', endDate: '', description: '', isCurrent: false}],
-            education: [], // Opcional, começa vazio
-            schooling: [], // Opcional, começa vazio
-            courses: [], // Opcional, começa vazio
+            education: [],
+            schooling: [],
+            courses: [],
             selectedTemplate: 1
         }
     });
@@ -62,6 +62,8 @@ export const UseFormScreenController = () => {
         const element = document.getElementById(id);
         if (element) element.scrollIntoView({behavior: 'smooth', block: 'start'});
     };
+
+    const goBack = () => navigate('/');
 
     const maskPhone = (value: string) => {
         if (!value) return "";
@@ -149,6 +151,7 @@ export const UseFormScreenController = () => {
             appendCourse,
             removeCourse,
             scrollToSection,
+            goBack,
             setTemplate: (id: number) => setValue('selectedTemplate', id),
             watch,
             setValue,

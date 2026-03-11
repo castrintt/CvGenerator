@@ -9,8 +9,10 @@ const ToggleButton = styled.button`
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 50%;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -22,6 +24,15 @@ const ToggleButton = styled.button`
 
     &:hover {
         transform: scale(1.1);
+    }
+
+    @media (max-width: 480px) {
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        min-height: 40px;
     }
 `;
 

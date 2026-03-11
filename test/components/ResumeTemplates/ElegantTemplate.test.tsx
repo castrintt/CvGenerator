@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ElegantTemplate } from '../../../src/components/ResumeTemplates/ElegantTemplate';
-import { ResumeData } from '../../../src/business/domain/models/curriculum.model';
+import { ResumeData } from '../../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {

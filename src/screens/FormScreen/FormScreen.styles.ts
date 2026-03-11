@@ -20,7 +20,6 @@ export const Sidebar = styled.div`
     flex-direction: column;
     position: fixed;
     height: 100vh;
-    overflow-y: auto;
     z-index: 10;
 
     @media (max-width: 768px) {
@@ -30,6 +29,27 @@ export const Sidebar = styled.div`
         border-right: none;
         border-bottom: 1px solid var(--border-color);
         padding: 20px;
+    }
+`;
+
+export const SidebarContent = styled.div`
+    flex: 1;
+    overflow-y: auto;
+
+    @media (max-width: 768px) {
+        overflow-y: visible;
+    }
+`;
+
+export const SidebarFooter = styled.div`
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-color);
+
+    @media (max-width: 768px) {
+        padding-top: 20px;
+        margin-top: 20px;
     }
 `;
 

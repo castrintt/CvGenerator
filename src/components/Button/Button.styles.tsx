@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 export const StyledButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'outline'; $fullWidth?: boolean }>`
     padding: 12px 24px;
+    min-height: 44px;
     border-radius: 8px;
     border: ${props => props.$variant === 'outline' ? '1px solid var(--border-color)' : 'none'};
     cursor: pointer;

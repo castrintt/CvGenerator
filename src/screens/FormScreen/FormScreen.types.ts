@@ -65,7 +65,7 @@ export const courseSchema = z.object({
 export const formSchema = z.object({
     personalInfo: personalInfoSchema,
     summary: z.string().min(20, 'O resumo deve ter pelo menos 20 caracteres'),
-    experience: z.array(experienceSchema).optional(), // Experiência agora é opcional também? O usuário pediu escolaridade e formação opcionais. Vou manter experiência como estava ou opcional? Geralmente é bom ter, mas vou deixar opcional para flexibilidade.
+    experience: z.array(experienceSchema).optional(),
     education: z.array(educationSchema).optional(),
     schooling: z.array(schoolingSchema).optional(),
     courses: z.array(courseSchema).optional(),
@@ -78,7 +78,8 @@ export type FormData = z.infer<typeof formSchema>;
 export type  FormScreenComponentProps = {
     controller: {
         actions: {
-            scrollToSection: (id: string) => void
+            scrollToSection: (id: string) => void;
+            goBack: () => void;
             register: any;
             handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
             appendExperience: (value: any) => void;

@@ -64,6 +64,14 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
                             <Button onClick={controller.actions.handleDownload}>
                                 Baixar como {controller.states.downloadFormat.toUpperCase()}
                             </Button>
+                            <Button
+                                variant="outline"
+                                fullWidth
+                                onClick={controller.actions.goToCreateAnother}
+                                style={{marginTop: 16}}
+                            >
+                                Cadastrar outro currículo
+                            </Button>
                         </DownloadSection>
                     </>
                 ) : (

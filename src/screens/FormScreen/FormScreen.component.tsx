@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ActionModal, CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
+import {ActionModal, CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, SidebarContent, SidebarFooter, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
 import type {FormScreenComponentProps} from "./FormScreen.types.ts";
@@ -139,39 +139,46 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
     return (
         <Container>
             <Sidebar>
-                <div>
-                    <h2 style={{fontSize: '24px', margin: 0}}>Onde você está</h2>
-                </div>
-                <StepIndicator>
-                    <Step $active={controller.states.activeSection === 'personal'}
-                          onClick={() => controller.actions.scrollToSection('personal')}>
-                        <span>1</span> Informações Pessoais
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'summary'}
-                          onClick={() => controller.actions.scrollToSection('summary')}>
-                        <span>2</span> Resumo Profissional
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'experience'}
-                          onClick={() => controller.actions.scrollToSection('experience')}>
-                        <span>3</span> Experiência
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'education'}
-                          onClick={() => controller.actions.scrollToSection('education')}>
-                        <span>4</span> Formação
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'schooling'}
-                          onClick={() => controller.actions.scrollToSection('schooling')}>
-                        <span>5</span> Escolaridade
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'courses'}
-                          onClick={() => controller.actions.scrollToSection('courses')}>
-                        <span>6</span> Cursos
-                    </Step>
-                    <Step $active={controller.states.activeSection === 'template'}
-                          onClick={() => controller.actions.scrollToSection('template')}>
-                        <span>7</span> Modelo
-                    </Step>
-                </StepIndicator>
+                <SidebarContent>
+                    <div>
+                        <h2 style={{fontSize: '24px', margin: 0}}>Onde você está</h2>
+                    </div>
+                    <StepIndicator>
+                        <Step $active={controller.states.activeSection === 'personal'}
+                              onClick={() => controller.actions.scrollToSection('personal')}>
+                            <span>1</span> Informações Pessoais
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'summary'}
+                              onClick={() => controller.actions.scrollToSection('summary')}>
+                            <span>2</span> Resumo Profissional
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'experience'}
+                              onClick={() => controller.actions.scrollToSection('experience')}>
+                            <span>3</span> Experiência
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'education'}
+                              onClick={() => controller.actions.scrollToSection('education')}>
+                            <span>4</span> Formação
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'schooling'}
+                              onClick={() => controller.actions.scrollToSection('schooling')}>
+                            <span>5</span> Escolaridade
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'courses'}
+                              onClick={() => controller.actions.scrollToSection('courses')}>
+                            <span>6</span> Cursos
+                        </Step>
+                        <Step $active={controller.states.activeSection === 'template'}
+                              onClick={() => controller.actions.scrollToSection('template')}>
+                            <span>7</span> Modelo
+                        </Step>
+                    </StepIndicator>
+                </SidebarContent>
+                <SidebarFooter>
+                    <Button variant="outline" fullWidth onClick={controller.actions.goBack}>
+                        ← Voltar
+                    </Button>
+                </SidebarFooter>
             </Sidebar>
 
             <MainContent>
