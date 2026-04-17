@@ -26,7 +26,7 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
 
     const registerForm = useForm({
         resolver: zodResolver(registerSchema),
-        defaultValues: {email: '', password: '', confirmPassword: ''},
+        defaultValues: {name: '', email: '', password: '', confirmPassword: ''},
     });
 
     const onLoginSubmit = loginForm.handleSubmit((data) =>
@@ -34,7 +34,7 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
     );
 
     const onRegisterSubmit = registerForm.handleSubmit((data) =>
-        controller.actions.handleRegister(data.email, data.password)
+        controller.actions.handleRegister(data.name, data.email, data.password)
     );
 
     if (isChoice) {
@@ -48,13 +48,6 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                     </Header>
 
                     <ButtonGroup>
-                        <Button
-                            fullWidth
-                            onClick={controller.actions.handleGoogleLogin}
-                            disabled={controller.states.isLoading}
-                        >
-                            Continuar com Google
-                        </Button>
                         <Button
                             variant="outline"
                             fullWidth
@@ -90,6 +83,13 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                     </Header>
 
                     <form onSubmit={onRegisterSubmit}>
+                        <Input
+                            label="Nome"
+                            type="text"
+                            placeholder="Seu nome completo"
+                            {...registerForm.register('name')}
+                            error={registerForm.formState.errors.name?.message}
+                        />
                         <Input
                             label="E-mail"
                             type="email"

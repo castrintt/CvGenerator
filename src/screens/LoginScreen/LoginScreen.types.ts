@@ -6,6 +6,7 @@ export const loginSchema = z.object({
 });
 
 export const registerSchema = z.object({
+    name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres'),
     email: z.string().email('E-mail inválido'),
     password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres'),
     confirmPassword: z.string(),
@@ -24,8 +25,7 @@ export type LoginScreenComponentProps = {
         actions: {
             setMode: (mode: LoginMode) => void;
             handleLogin: (email: string, password: string) => Promise<void>;
-            handleRegister: (email: string, password: string) => Promise<void>;
-            handleGoogleLogin: () => Promise<void>;
+            handleRegister: (name: string, email: string, password: string) => Promise<void>;
             goBack: () => void;
         };
         states: {

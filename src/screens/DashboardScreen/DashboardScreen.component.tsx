@@ -8,6 +8,9 @@ import {
     useDroppable,
     pointerWithin,
     closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
 } from '@dnd-kit/core';
 import {SortableContext, horizontalListSortingStrategy, useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
@@ -241,6 +244,10 @@ function SortableSectionColumn({
 export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> = ({
     controller,
 }) => {
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    );
+
     const [editModal, setEditModal] = useState<EditModalState>({
         jobApplication: null,
         sectionId: null,
@@ -405,6 +412,7 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
             </ScrollNotice>
 
             <DndContext
+                sensors={sensors}
                 collisionDetection={isEditSectionsMode ? closestCenter : pointerWithin}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}

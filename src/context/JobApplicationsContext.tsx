@@ -1,32 +1,12 @@
-import React, {createContext, ReactNode, useContext, useState, useEffect, useCallback} from 'react';
-import type {JobApplication} from '../../business/domain/models/jobApplication.model';
-
-const STORAGE_KEY = 'cvgenerator_job_applications';
-
-function migrateFromLegacy(data: unknown): JobApplication[] {
-    if (!Array.isArray(data)) return [];
-    const sectionMap: Record<string, string> = {
-        vagas_candidatadas: 'applied',
-        em_processo: 'in_progress',
-        devolutivas_positivas: 'positive_feedback',
-        negadas: 'rejected',
-        vagas_frias: 'applied',
-        cold: 'applied',
-    };
-    return data.map((item: Record<string, unknown>) => {
-        const legacySection = item.sectionId as string;
-        const sectionId = sectionMap[legacySection] ?? legacySection;
-        return {
-            id: String(item.id ?? ''),
-            company: String(item.company ?? item.empresa ?? ''),
-            position: String(item.position ?? item.cargo ?? ''),
-            appliedDate: String(item.appliedDate ?? item.dataCandidatura ?? ''),
-            link: item.link ? String(item.link) : undefined,
-            notes: item.notes ?? item.observacoes ? String(item.notes ?? item.observacoes) : undefined,
-            sectionId,
-        };
-    });
-}
+import React, { createContext, ReactNode, useContext, useState, useEffect, useCallback } from 'react';
+import { useSelector } from 'react-redux';
+import { container } from '../../business/ioc/ioc.config';
+import { CategorySymbols } from '../../business/ioc/symbols/category.symbols';
+import { JobSymbols } from '../../business/ioc/symbols/job.symbols';
+import type { ICategoryService } from '../../business/domain/interfaces/i-category.service';
+import type { IJobService } from '../../business/domain/interfaces/i-job.service';
+import type { JobApplication } from '../../business/domain/models/jobApplication.model';
+import { selectUserId } from '../store/auth.slice';
 
 interface JobApplicationsContextType {
     jobApplications: JobApplication[];
@@ -41,92 +21,123 @@ interface JobApplicationsContextType {
 
 const JobApplicationsContext = createContext<JobApplicationsContextType | undefined>(undefined);
 
+const categoryService = container.get<ICategoryService>(CategorySymbols.CategoryService);
+const jobService = container.get<IJobService>(JobSymbols.JobService);
+
 const generateId = () => `job-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
-export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({children}) => {
+export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
+    const userId = useSelector(selectUserId);
 
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (!stored) {
-            const legacyStored = localStorage.getItem('cvgenerator_candidaturas');
-            if (legacyStored) {
-                try {
-                    const parsed = JSON.parse(legacyStored);
-                    const migrated = migrateFromLegacy(parsed);
-                    setJobApplications(migrated);
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-                    localStorage.removeItem('cvgenerator_candidaturas');
-                } catch {
-                    localStorage.removeItem('cvgenerator_candidaturas');
-                }
-            }
+        if (!userId) {
+            setJobApplications([]);
             return;
         }
-        try {
-            const parsed = JSON.parse(stored);
-            const items = Array.isArray(parsed) ? parsed : [];
-            const migrated = items.map((item: JobApplication) =>
-                item.sectionId === 'cold' ? {...item, sectionId: 'applied'} : item
-            );
-            if (migrated.some((item: JobApplication, i: number) => item.sectionId !== items[i]?.sectionId)) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-            }
-            setJobApplications(migrated);
-        } catch {
-            localStorage.removeItem(STORAGE_KEY);
-        }
-    }, []);
 
-    useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(jobApplications));
-    }, [jobApplications]);
+        categoryService
+            .findAllCategories(userId)
+            .then(({ jobApplications: fetched }) => {
+                setJobApplications(fetched);
+            })
+            .catch(() => setJobApplications([]));
+    }, [userId]);
 
     const addJobApplication = useCallback(
-        (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => {
+        (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>): JobApplication => {
             const newItem: JobApplication = {
                 ...data,
                 id: generateId(),
                 sectionId,
             };
             setJobApplications((prev) => [...prev, newItem]);
+
+            jobService
+                .createJob({
+                    enterpriseName: data.company,
+                    jobTitle: data.position,
+                    candidatedAt: data.appliedDate,
+                    jobLink: data.link ?? '',
+                    observation: data.notes ?? '',
+                    categoryId: sectionId,
+                })
+                .catch(() => {
+                    setJobApplications((prev) => prev.filter((j) => j.id !== newItem.id));
+                });
+
             return newItem;
         },
-        []
+        [],
     );
 
-    const updateJobApplication = useCallback((id: string, data: Partial<JobApplication>) => {
-        setJobApplications((prev) =>
-            prev.map((item) => (item.id === id ? {...item, ...data} : item))
-        );
-    }, []);
+    const updateJobApplication = useCallback(
+        (id: string, data: Partial<JobApplication>) => {
+            setJobApplications((prev) =>
+                prev.map((item) => (item.id === id ? { ...item, ...data } : item)),
+            );
+
+            const current = jobApplications.find((j) => j.id === id);
+            if (current) {
+                const merged = { ...current, ...data };
+                jobService
+                    .updateJob({
+                        id,
+                        enterpriseName: merged.company,
+                        jobTitle: merged.position,
+                        candidatedAt: merged.appliedDate,
+                        jobLink: merged.link ?? '',
+                        observation: merged.notes ?? '',
+                    })
+                    .catch(() => {
+                        setJobApplications((prev) =>
+                            prev.map((item) => (item.id === id ? current : item)),
+                        );
+                    });
+            }
+        },
+        [jobApplications],
+    );
 
     const moveJobApplication = useCallback((id: string, newSectionId: string) => {
         setJobApplications((prev) =>
-            prev.map((item) => (item.id === id ? {...item, sectionId: newSectionId} : item))
+            prev.map((item) => (item.id === id ? { ...item, sectionId: newSectionId } : item)),
         );
+
+        jobService
+            .switchJobCategory({ id, categoryId: newSectionId })
+            .catch(() => { /* optimistic — silently ignore */ });
     }, []);
 
     const moveAllFromSection = useCallback((fromSectionId: string, toSectionId: string) => {
         setJobApplications((prev) =>
             prev.map((item) =>
-                item.sectionId === fromSectionId ? {...item, sectionId: toSectionId} : item
-            )
+                item.sectionId === fromSectionId ? { ...item, sectionId: toSectionId } : item,
+            ),
         );
-    }, []);
+
+        const toMove = jobApplications.filter((j) => j.sectionId === fromSectionId);
+        toMove.forEach((job) => {
+            jobService.switchJobCategory({ id: job.id, categoryId: toSectionId }).catch(() => { });
+        });
+    }, [jobApplications]);
 
     const removeJobApplication = useCallback((id: string) => {
         setJobApplications((prev) => prev.filter((item) => item.id !== id));
+        jobService.deleteJob(id).catch(() => { /* optimistic */ });
     }, []);
 
     const removeAllFromSection = useCallback((sectionId: string) => {
+        const toRemove = jobApplications.filter((j) => j.sectionId === sectionId);
         setJobApplications((prev) => prev.filter((item) => item.sectionId !== sectionId));
-    }, []);
+        toRemove.forEach((job) => {
+            jobService.deleteJob(job.id).catch(() => { });
+        });
+    }, [jobApplications]);
 
     const getBySection = useCallback(
-        (sectionId: string) =>
-            jobApplications.filter((item) => item.sectionId === sectionId),
-        [jobApplications]
+        (sectionId: string) => jobApplications.filter((item) => item.sectionId === sectionId),
+        [jobApplications],
     );
 
     return (

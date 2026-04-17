@@ -6,7 +6,7 @@ export type LoginMode = 'choice' | 'login' | 'register';
 
 export const UseLoginScreenController = () => {
     const navigate = useNavigate();
-    const {loginWithEmail, registerWithEmail, loginWithGoogle} = useAuth();
+    const {loginWithEmail, registerWithEmail} = useAuth();
     const [mode, setMode] = useState<LoginMode>('choice');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -19,34 +19,21 @@ export const UseLoginScreenController = () => {
         try {
             await loginWithEmail(email, password);
             navigate('/dashboard');
-        } catch (e) {
+        } catch {
             setError('Erro ao fazer login. Verifique suas credenciais.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleRegister = async (email: string, password: string) => {
+    const handleRegister = async (name: string, email: string, password: string) => {
         setError(null);
         setIsLoading(true);
         try {
-            await registerWithEmail(email, password);
+            await registerWithEmail(name, email, password);
             navigate('/dashboard');
-        } catch (e) {
+        } catch {
             setError('Erro ao criar conta. Tente novamente.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleGoogleLogin = async () => {
-        setError(null);
-        setIsLoading(true);
-        try {
-            await loginWithGoogle();
-            navigate('/dashboard');
-        } catch (e) {
-            setError('Erro ao conectar com Google.');
         } finally {
             setIsLoading(false);
         }
@@ -57,7 +44,6 @@ export const UseLoginScreenController = () => {
             setMode,
             handleLogin,
             handleRegister,
-            handleGoogleLogin,
             goBack,
         },
         states: {
