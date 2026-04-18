@@ -1,5 +1,6 @@
 import {z} from 'zod';
-import React from "react";
+import React from 'react';
+import type {ResumeData} from '../../../business/domain/models/curriculum.model';
 
 export const personalInfoSchema = z.object({
     fullName: z.string().min(3, 'Nome completo é obrigatório'),
@@ -74,8 +75,65 @@ export const formSchema = z.object({
 
 export type FormData = z.infer<typeof formSchema>;
 
+export type FormScreenTemplateNameOption = {
+    id: number;
+    name: string;
+};
 
-export type  FormScreenComponentProps = {
+export const FORM_SCREEN_TEMPLATE_NAMES: FormScreenTemplateNameOption[] = [
+    {id: 1, name: 'Clássico'},
+    {id: 2, name: 'Moderno Lateral'},
+    {id: 3, name: 'Minimalista'},
+    {id: 4, name: 'Tradicional'},
+    {id: 5, name: 'Criativo'},
+    {id: 6, name: 'Profissional'},
+    {id: 7, name: 'Elegante'},
+    {id: 8, name: 'Tech (Dark)'},
+];
+
+export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
+    personalInfo: {
+        fullName: 'Maria Oliveira',
+        email: 'maria.oliveira@email.com',
+        phone: '(11) 98765-4321',
+        address: 'Rio de Janeiro, RJ',
+        linkedin: 'linkedin.com/in/mariaoliveira',
+    },
+    summary:
+        'Profissional organizada e proativa com experiência em atendimento ao cliente e gestão administrativa. Busco oportunidades para aplicar minhas habilidades de comunicação e resolução de problemas.',
+    experience: [
+        {
+            company: 'Comércio & Cia',
+            position: 'Assistente Administrativo',
+            startDate: '2019-03',
+            endDate: '2022-05',
+            description:
+                'Responsável pelo atendimento ao cliente, organização de arquivos e suporte à gerência.',
+        },
+    ],
+    education: [
+        {
+            institution: 'Universidade Federal',
+            degree: 'Bacharelado',
+            fieldOfStudy: 'Administração',
+            graduationDate: '2018-12',
+        },
+    ],
+    schooling: [
+        {
+            institution: 'Escola Estadual',
+            degree: 'Ensino Médio Completo',
+            completionDate: '2014-12',
+        },
+    ],
+    courses: [
+        {name: 'Excel Avançado', institution: 'Curso Online', duration: '40h'},
+        {name: 'Inglês Intermediário', institution: 'Escola de Idiomas', duration: '2 anos'},
+    ],
+    selectedTemplate: 1,
+};
+
+export type FormScreenComponentProps = {
     controller: {
         actions: {
             scrollToSection: (id: string) => void;
@@ -95,6 +153,11 @@ export type  FormScreenComponentProps = {
             setValue: any;
             handlePhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
             handleDateChange: (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => void;
+            openActionModal: (templateId: number) => void;
+            closeActionModal: () => void;
+            selectTemplateFromModal: () => void;
+            openPreviewFromModal: () => void;
+            closePreview: () => void;
         };
         states: {
             activeSection: string
@@ -104,6 +167,9 @@ export type  FormScreenComponentProps = {
             schoolingFields: any[];
             courseFields: any[];
             selectedTemplate: number;
+            previewTemplateId: number | null;
+            actionModalTemplateId: number | null;
+            scale: number;
         };
     }
 

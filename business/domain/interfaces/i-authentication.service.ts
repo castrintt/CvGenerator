@@ -3,4 +3,5 @@ import type { AuthenticatedUserDto, LoginCredentialsDto, RegisterCredentialsDto 
 export interface IAuthenticationService {
   loginWithCredentials(dto: LoginCredentialsDto): Promise<AuthenticatedUserDto>;
   registerWithCredentials(dto: RegisterCredentialsDto): Promise<void>;
+  logout(): Promise<void>;
 }

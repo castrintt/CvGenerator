@@ -16,7 +16,7 @@ interface AuthContextType {
     isLoading: boolean;
     loginWithEmail: (email: string, password: string) => Promise<void>;
     registerWithEmail: (name: string, email: string, password: string) => Promise<void>;
-    logout: () => void;
+    logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,8 +78,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     };
 
-    const logout = () => {
-        persistUser(null);
+    const logout = async () => {
+        try {
+            await authService.logout();
+        } finally {
+            persistUser(null);
+        }
     };
 
     return (

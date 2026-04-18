@@ -2,10 +2,17 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
     min-height: 100vh;
+    min-height: 100dvh;
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
     background-color: var(--background-color);
     color: var(--text-primary);
     padding: 20px 24px 24px;
     padding-right: 100px;
+    box-sizing: border-box;
+    overflow: hidden;
 
     @media (max-width: 768px) {
         padding-right: 80px;
@@ -18,6 +25,7 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.header`
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -88,48 +96,47 @@ export const UserInfo = styled.div`
     }
 `;
 
-export const InstructionNotice = styled.div`
-    background: rgba(45, 156, 219, 0.1);
-    border: 1px solid var(--accent-color);
-    border-radius: 8px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    color: var(--text-primary);
-    font-size: 14px;
-    line-height: 1.5;
-
-    strong {
-        color: var(--accent-color);
-    }
-
-    @media (max-width: 480px) {
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-`;
-
-export const ScrollNotice = styled.div`
-    background: var(--secondary-color);
+/** Bloco único de ajuda (seções) no dashboard */
+export const HelpSection = styled.div`
+    flex-shrink: 0;
+    background: rgba(45, 156, 219, 0.08);
     border: 1px solid var(--border-color);
     border-radius: 8px;
-    padding: 10px 16px;
-    margin-bottom: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
     color: var(--text-secondary);
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.55;
+
+    strong {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
 
     @media (max-width: 480px) {
-        padding: 8px 14px;
+        padding: 12px 14px;
         font-size: 12px;
     }
 `;
 
-export const Board = styled.div`
+/** Envolve o board e o overlay para o board ocupar a altura restante da viewport */
+export const BoardShell = styled.div`
+    flex: 1;
+    min-height: 0;
     display: flex;
+    flex-direction: column;
+    position: relative;
+`;
+
+export const Board = styled.div`
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: stretch;
     gap: 24px;
     overflow-x: auto;
-    padding-bottom: 24px;
-    min-height: 500px;
+    overflow-y: hidden;
+    padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
 
     &::-webkit-scrollbar {
@@ -146,8 +153,6 @@ export const Board = styled.div`
 
     @media (max-width: 480px) {
         gap: 16px;
-        padding-bottom: 16px;
-        min-height: 400px;
     }
 `;
 
@@ -168,7 +173,12 @@ const sectionBorderVar: Record<string, string> = {
 };
 
 export const Column = styled.div<{ $isOver?: boolean; $colorKey?: string }>`
-    flex: 0 0 280px;
+    flex: 1;
+    min-height: 0;
+    min-width: 0;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
     background: ${(p) => (p.$colorKey ? sectionBgVar[p.$colorKey] ?? 'var(--card-bg)' : 'var(--card-bg)')};
     border: 2px dashed ${(p) => {
         if (p.$isOver) return 'var(--accent-color)';
@@ -176,12 +186,10 @@ export const Column = styled.div<{ $isOver?: boolean; $colorKey?: string }>`
     }};
     border-radius: 12px;
     padding: 16px;
-    min-height: 200px;
     transition: border-color 0.2s, background 0.2s;
     ${(p) => p.$isOver && 'background: rgba(45, 156, 219, 0.15) !important;'}
 
     @media (max-width: 480px) {
-        flex: 0 0 260px;
         padding: 12px;
     }
 `;
@@ -229,10 +237,28 @@ export const AddButton = styled.button`
 `;
 
 export const CardsList = styled.div`
+    flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
-    min-height: 60px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: 4px;
+    margin-right: -4px;
+
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: var(--secondary-color);
+        border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: 4px;
+    }
 `;
 
 export const DragOverlayCard = styled.div`
@@ -329,19 +355,47 @@ export const HeaderActions = styled.div`
 
 export const SortableSection = styled.div<{ $isDragging?: boolean }>`
     flex: 0 0 280px;
+    max-width: 280px;
+    min-height: 0;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
     opacity: ${(p) => (p.$isDragging ? 0.7 : 1)};
+
+    @media (max-width: 480px) {
+        flex: 0 0 260px;
+        max-width: 260px;
+    }
+`;
+
+/** Área pelo qual se arrasta a coluna para reordenar (não inclui cards de vaga) */
+export const SectionDragHandle = styled.div`
+    display: flex;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
     cursor: grab;
+    padding: 4px 6px 4px 0;
+    margin: -4px 0;
+    border-radius: 6px;
 
     &:active {
         cursor: grabbing;
     }
 
-    @media (max-width: 480px) {
-        flex: 0 0 260px;
+    h3 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 `;
 
 export const SectionEditHeader = styled.div`
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;

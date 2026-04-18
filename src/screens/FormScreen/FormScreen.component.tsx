@@ -1,8 +1,12 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import {ActionModal, CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, SidebarContent, SidebarFooter, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
-import type {FormScreenComponentProps} from "./FormScreen.types.ts";
+import {
+    FORM_SCREEN_PREVIEW_FAKE_DATA,
+    FORM_SCREEN_TEMPLATE_NAMES,
+    type FormScreenComponentProps,
+} from './FormScreen.types';
 import {ClassicTemplate} from '../../components/ResumeTemplates/ClassicTemplate';
 import {ModernSidebarTemplate} from '../../components/ResumeTemplates/ModernSidebarTemplate';
 import {MinimalistTemplate} from '../../components/ResumeTemplates/MinimalistTemplate';
@@ -11,50 +15,8 @@ import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplat
 import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
 import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
 import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
-import type {ResumeData} from "../../../business/domain/models/curriculum.model.ts";
-
-const FAKE_DATA: ResumeData = {
-    personalInfo: {
-        fullName: "Maria Oliveira",
-        email: "maria.oliveira@email.com",
-        phone: "(11) 98765-4321",
-        address: "Rio de Janeiro, RJ",
-        linkedin: "linkedin.com/in/mariaoliveira"
-    },
-    summary: "Profissional organizada e proativa com experiência em atendimento ao cliente e gestão administrativa. Busco oportunidades para aplicar minhas habilidades de comunicação e resolução de problemas.",
-    experience: [
-        {
-            company: "Comércio & Cia",
-            position: "Assistente Administrativo",
-            startDate: "2019-03",
-            endDate: "2022-05",
-            description: "Responsável pelo atendimento ao cliente, organização de arquivos e suporte à gerência."
-        }
-    ],
-    education: [
-        {
-            institution: "Universidade Federal",
-            degree: "Bacharelado",
-            fieldOfStudy: "Administração",
-            graduationDate: "2018-12"
-        }
-    ],
-    schooling: [
-        {
-            institution: "Escola Estadual",
-            degree: "Ensino Médio Completo",
-            completionDate: "2014-12"
-        }
-    ],
-    courses: [
-        {name: "Excel Avançado", institution: "Curso Online", duration: "40h"},
-        {name: "Inglês Intermediário", institution: "Escola de Idiomas", duration: "2 anos"}
-    ],
-    selectedTemplate: 1
-};
-
 const RenderTemplatePreview = (templateId: number) => {
-    const data = {...FAKE_DATA, selectedTemplate: templateId};
+    const data = {...FORM_SCREEN_PREVIEW_FAKE_DATA, selectedTemplate: templateId};
     switch (templateId) {
         case 1: return <ClassicTemplate data={data}/>;
         case 2: return <ModernSidebarTemplate data={data}/>;
@@ -68,74 +30,7 @@ const RenderTemplatePreview = (templateId: number) => {
     }
 };
 
-const TEMPLATE_NAMES = [
-    {id: 1, name: "Clássico"},
-    {id: 2, name: "Moderno Lateral"},
-    {id: 3, name: "Minimalista"},
-    {id: 4, name: "Tradicional"},
-    {id: 5, name: "Criativo"},
-    {id: 6, name: "Profissional"},
-    {id: 7, name: "Elegante"},
-    {id: 8, name: "Tech (Dark)"}
-];
-
 export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({controller}) => {
-    const [previewTemplateId, setPreviewTemplateId] = useState<number | null>(null);
-    const [actionModalTemplateId, setActionModalTemplateId] = useState<number | null>(null);
-    const [scale, setScale] = useState(1);
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (!previewTemplateId) return;
-            
-            const a4HeightMm = 297;
-            const a4WidthMm = 210;
-            
-            const a4HeightPx = (a4HeightMm * 96) / 25.4;
-            const a4WidthPx = (a4WidthMm * 96) / 25.4;
-            
-            const vh = window.innerHeight - 80;
-            const vw = window.innerWidth - 80;
-            
-            const scaleHeight = vh / a4HeightPx;
-            const scaleWidth = vw / a4WidthPx;
-            
-            const newScale = Math.min(scaleHeight, scaleWidth, 1);
-            setScale(newScale);
-        };
-
-        window.addEventListener('resize', handleResize);
-        handleResize();
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, [previewTemplateId]);
-
-    const openActionModal = (id: number) => {
-        setActionModalTemplateId(id);
-    };
-
-    const closeActionModal = () => {
-        setActionModalTemplateId(null);
-    };
-
-    const handleSelect = () => {
-        if (actionModalTemplateId) {
-            controller.actions.setTemplate(actionModalTemplateId);
-        }
-        closeActionModal();
-    };
-
-    const handlePreview = () => {
-        if (actionModalTemplateId) {
-            setPreviewTemplateId(actionModalTemplateId);
-        }
-        closeActionModal();
-    };
-
-    const closePreview = () => {
-        setPreviewTemplateId(null);
-    };
-
     return (
         <Container>
             <Sidebar>
@@ -425,11 +320,11 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                     <Section id="template">
                         <Title>Escolha o Modelo</Title>
                         <TemplateGrid>
-                            {TEMPLATE_NAMES.map((template) => (
+                            {FORM_SCREEN_TEMPLATE_NAMES.map((template) => (
                                 <TemplateCard
                                     key={template.id}
                                     $selected={controller.states.selectedTemplate === template.id}
-                                    onClick={() => openActionModal(template.id)}
+                                    onClick={() => controller.actions.openActionModal(template.id)}
                                 >
                                     <TemplateMiniature>
                                         {RenderTemplatePreview(template.id)}
@@ -448,24 +343,24 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                 </form>
             </MainContent>
 
-            {actionModalTemplateId && (
-                <ModalOverlay onClick={closeActionModal}>
+            {controller.states.actionModalTemplateId !== null && (
+                <ModalOverlay onClick={controller.actions.closeActionModal}>
                     <ActionModal onClick={e => e.stopPropagation()}>
                         <h3>O que você deseja fazer?</h3>
                         <div>
-                            <Button onClick={handleSelect}>Selecionar Modelo</Button>
-                            <Button variant="outline" onClick={handlePreview}>Visualizar</Button>
+                            <Button onClick={controller.actions.selectTemplateFromModal}>Selecionar Modelo</Button>
+                            <Button variant="outline" onClick={controller.actions.openPreviewFromModal}>Visualizar</Button>
                         </div>
                     </ActionModal>
                 </ModalOverlay>
             )}
 
-            {previewTemplateId && (
-                <ModalOverlay onClick={closePreview}>
+            {controller.states.previewTemplateId !== null && (
+                <ModalOverlay onClick={controller.actions.closePreview}>
                     <ModalContent onClick={e => e.stopPropagation()}>
-                        <CloseButton onClick={closePreview}>×</CloseButton>
-                        <PreviewContainer $scale={scale}>
-                            {RenderTemplatePreview(previewTemplateId)}
+                        <CloseButton onClick={controller.actions.closePreview}>×</CloseButton>
+                        <PreviewContainer $scale={controller.states.scale}>
+                            {RenderTemplatePreview(controller.states.previewTemplateId)}
                         </PreviewContainer>
                     </ModalContent>
                 </ModalOverlay>

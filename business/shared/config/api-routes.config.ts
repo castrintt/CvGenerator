@@ -2,6 +2,7 @@ export const ApiRoutes = {
   auth: {
     signIn: '/auth',
     refresh: '/auth/refresh',
+    logout: '/auth/logout',
   },
   user: {
     create: '/users/create',

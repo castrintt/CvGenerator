@@ -22,4 +22,8 @@ export class AuthenticationService implements IAuthenticationService {
   async registerWithCredentials(dto: RegisterCredentialsDto): Promise<void> {
     return this.gateway.register(dto);
   }
+
+  async logout(): Promise<void> {
+    return this.gateway.logout();
+  }
 }

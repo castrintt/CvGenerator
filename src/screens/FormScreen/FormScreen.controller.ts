@@ -8,6 +8,9 @@ import {useResumeContext} from "../../context/ResumeContext.tsx";
 
 export const UseFormScreenController = () => {
     const [activeSection, setActiveSection] = useState('personal');
+    const [previewTemplateId, setPreviewTemplateId] = useState<number | null>(null);
+    const [actionModalTemplateId, setActionModalTemplateId] = useState<number | null>(null);
+    const [scale, setScale] = useState(1);
 
     const {setResumeData} = useResumeContext()
 
@@ -138,6 +141,58 @@ export const UseFormScreenController = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    useEffect(() => {
+        const handleResize = () => {
+            if (!previewTemplateId) return;
+
+            const a4HeightMm = 297;
+            const a4WidthMm = 210;
+
+            const a4HeightPx = (a4HeightMm * 96) / 25.4;
+            const a4WidthPx = (a4WidthMm * 96) / 25.4;
+
+            const vh = window.innerHeight - 80;
+            const vw = window.innerWidth - 80;
+
+            const scaleHeight = vh / a4HeightPx;
+            const scaleWidth = vw / a4WidthPx;
+
+            const newScale = Math.min(scaleHeight, scaleWidth, 1);
+            setScale(newScale);
+        };
+
+        window.addEventListener('resize', handleResize);
+        handleResize();
+
+        return () => window.removeEventListener('resize', handleResize);
+    }, [previewTemplateId]);
+
+    const openActionModal = (templateId: number) => {
+        setActionModalTemplateId(templateId);
+    };
+
+    const closeActionModal = () => {
+        setActionModalTemplateId(null);
+    };
+
+    const selectTemplateFromModal = () => {
+        if (actionModalTemplateId !== null) {
+            setValue('selectedTemplate', actionModalTemplateId);
+        }
+        closeActionModal();
+    };
+
+    const openPreviewFromModal = () => {
+        if (actionModalTemplateId !== null) {
+            setPreviewTemplateId(actionModalTemplateId);
+        }
+        closeActionModal();
+    };
+
+    const closePreview = () => {
+        setPreviewTemplateId(null);
+    };
+
     return {
         actions: {
             register,
@@ -156,7 +211,12 @@ export const UseFormScreenController = () => {
             watch,
             setValue,
             handlePhoneChange,
-            handleDateChange
+            handleDateChange,
+            openActionModal,
+            closeActionModal,
+            selectTemplateFromModal,
+            openPreviewFromModal,
+            closePreview,
         },
         states: {
             errors,
@@ -165,7 +225,10 @@ export const UseFormScreenController = () => {
             educationFields,
             schoolingFields,
             courseFields,
-            selectedTemplate
+            selectedTemplate,
+            previewTemplateId,
+            actionModalTemplateId,
+            scale,
         }
     };
 };

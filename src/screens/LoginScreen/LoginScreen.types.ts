@@ -1,4 +1,6 @@
 import {z} from 'zod';
+import type {BaseSyntheticEvent} from 'react';
+import type {UseFormReturn} from 'react-hook-form';
 
 export const loginSchema = z.object({
     email: z.string().email('E-mail inválido'),
@@ -20,18 +22,21 @@ export type RegisterFormData = z.infer<typeof registerSchema>;
 
 export type LoginMode = 'choice' | 'login' | 'register';
 
-export type LoginScreenComponentProps = {
-    controller: {
-        actions: {
-            setMode: (mode: LoginMode) => void;
-            handleLogin: (email: string, password: string) => Promise<void>;
-            handleRegister: (name: string, email: string, password: string) => Promise<void>;
-            goBack: () => void;
-        };
-        states: {
-            mode: LoginMode;
-            isLoading: boolean;
-            error: string | null;
-        };
+export type LoginScreenController = {
+    actions: {
+        setMode: (mode: LoginMode) => void;
+        goBack: () => void;
+        submitLogin: (e?: BaseSyntheticEvent) => Promise<void>;
+        submitRegister: (e?: BaseSyntheticEvent) => Promise<void>;
     };
+    states: {
+        mode: LoginMode;
+        isLoading: boolean;
+        loginForm: UseFormReturn<LoginFormData>;
+        registerForm: UseFormReturn<RegisterFormData>;
+    };
+};
+
+export type LoginScreenComponentProps = {
+    controller: LoginScreenController;
 };

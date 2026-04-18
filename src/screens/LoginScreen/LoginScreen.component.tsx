@@ -1,41 +1,21 @@
 import React from 'react';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
 import {
     BackButton,
     ButtonGroup,
     Card,
     Container,
-    ErrorMessage,
     Header,
     ToggleMode,
 } from './LoginScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
 import type {LoginScreenComponentProps} from './LoginScreen.types';
-import {loginSchema, registerSchema} from './LoginScreen.types';
 
 export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({controller}) => {
     const isRegister = controller.states.mode === 'register';
     const isChoice = controller.states.mode === 'choice';
-
-    const loginForm = useForm({
-        resolver: zodResolver(loginSchema),
-        defaultValues: {email: '', password: ''},
-    });
-
-    const registerForm = useForm({
-        resolver: zodResolver(registerSchema),
-        defaultValues: {name: '', email: '', password: '', confirmPassword: ''},
-    });
-
-    const onLoginSubmit = loginForm.handleSubmit((data) =>
-        controller.actions.handleLogin(data.email, data.password)
-    );
-
-    const onRegisterSubmit = registerForm.handleSubmit((data) =>
-        controller.actions.handleRegister(data.name, data.email, data.password)
-    );
+    const loginForm = controller.states.loginForm;
+    const registerForm = controller.states.registerForm;
 
     if (isChoice) {
         return (
@@ -64,9 +44,6 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                         </Button>
                     </ButtonGroup>
 
-                    {controller.states.error && (
-                        <ErrorMessage>{controller.states.error}</ErrorMessage>
-                    )}
                 </Card>
             </Container>
         );
@@ -82,7 +59,7 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                         <p>Preencha os dados para criar sua conta</p>
                     </Header>
 
-                    <form onSubmit={onRegisterSubmit}>
+                    <form onSubmit={controller.actions.submitRegister}>
                         <Input
                             label="Nome"
                             type="text"
@@ -118,10 +95,6 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                         </ButtonGroup>
                     </form>
 
-                    {controller.states.error && (
-                        <ErrorMessage>{controller.states.error}</ErrorMessage>
-                    )}
-
                     <ToggleMode>
                         Já tem conta?{' '}
                         <button type="button" onClick={() => controller.actions.setMode('login')}>
@@ -142,7 +115,7 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                     <p>Entre com seu e-mail e senha</p>
                 </Header>
 
-                <form onSubmit={onLoginSubmit}>
+                <form onSubmit={controller.actions.submitLogin}>
                     <Input
                         label="E-mail"
                         type="email"
@@ -163,10 +136,6 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                         </Button>
                     </ButtonGroup>
                 </form>
-
-                {controller.states.error && (
-                    <ErrorMessage>{controller.states.error}</ErrorMessage>
-                )}
 
                 <ToggleMode>
                     Não tem conta?{' '}

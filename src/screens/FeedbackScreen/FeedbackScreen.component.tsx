@@ -9,9 +9,12 @@ import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplat
 import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
 import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
 import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
-import type {FeedbackScreenComponentProps} from "./FeedbackScreen.types.ts";
+import type {
+    FeedbackScreenComponentProps,
+    FeedbackScreenResumeTemplateProps,
+} from './FeedbackScreen.types';
 
-const RenderTemplate = (resumeData: any) => {
+const RenderTemplate: React.FC<FeedbackScreenResumeTemplateProps> = ({resumeData}) => {
     switch (resumeData.selectedTemplate) {
         case 1: return <ClassicTemplate data={resumeData}/>;
         case 2: return <ModernSidebarTemplate data={resumeData}/>;
@@ -93,7 +96,7 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
 
             <PreviewArea>
                 <ResumePreview id="resume-preview">
-                    {RenderTemplate(controller.states.resumeData)}
+                    <RenderTemplate resumeData={controller.states.resumeData} />
                 </ResumePreview>
             </PreviewArea>
         </Container>

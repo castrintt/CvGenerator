@@ -1,483 +1,127 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
     DndContext,
-    DragEndEvent,
     DragOverlay,
-    DragStartEvent,
-    useDraggable,
-    useDroppable,
-    pointerWithin,
-    closestCenter,
-    PointerSensor,
-    useSensor,
-    useSensors,
 } from '@dnd-kit/core';
-import {SortableContext, horizontalListSortingStrategy, useSortable} from '@dnd-kit/sortable';
-import {CSS} from '@dnd-kit/utilities';
+import {SortableContext, horizontalListSortingStrategy} from '@dnd-kit/sortable';
 import {
-    AddButton,
     Board,
-    Card,
-    CardActions,
-    CardsList,
-    Column,
-    ColumnHeader,
+    BoardShell,
     Container,
-    DragOverlayCard,
-    FormRow,
-    Header,
-    HeaderActions,
-    InstructionNotice,
     DeleteModalActions,
     DeleteModalBody,
     DeleteModalConfirm,
     DeleteModalContent,
     DeleteModalSectionName,
     DeleteModalWarning,
+    DragOverlayCard,
+    FormRow,
+    Header,
+    HeaderActions,
+    HelpSection,
     ModalActions,
     ModalContent,
     ModalOverlay,
-    RemoveCardBtn,
-    ScrollNotice,
-    SectionDeleteBtn,
-    SectionEditActions,
-    SectionEditHeader,
-    SortableSection,
     UserInfo,
 } from './DashboardScreen.styles';
 import {Button} from '../../components/Button/Button';
 import type {DashboardScreenComponentProps} from './DashboardScreen.types';
-import type {JobApplication} from '../../../business/domain/models/jobApplication.model';
-import type {Section} from '../../../business/domain/models/section.model';
-
-const formatDateBR = (isoDate: string): string => {
-    if (!isoDate) return '';
-    const [y, m, d] = isoDate.split('-');
-    return d && m && y ? `${d}/${m}/${y}` : isoDate;
-};
-
-/** Converte DD/MM/AAAA para AAAA-MM-DD (ISO). Retorna string vazia se inválido. */
-const brToIso = (brDate: string): string => {
-    const trimmed = brDate.trim().replace(/\s/g, '');
-    if (!trimmed) return '';
-    const parts = trimmed.split('/');
-    if (parts.length !== 3) return '';
-    const [d, m, y] = parts;
-    const day = parseInt(d, 10);
-    const month = parseInt(m, 10);
-    const year = parseInt(y, 10);
-    if (isNaN(day) || isNaN(month) || isNaN(year)) return '';
-    if (day < 1 || day > 31 || month < 1 || month > 12 || year < 1900 || year > 2100) return '';
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${year}-${pad(month)}-${pad(day)}`;
-};
-
-/** Máscara para input DD/MM/AAAA */
-const maskDateBr = (value: string): string => {
-    const digits = value.replace(/\D/g, '').slice(0, 8);
-    if (digits.length <= 2) return digits;
-    if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-    return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-};
-
-type EditModalState = {
-    jobApplication: JobApplication | null;
-    sectionId: string | null;
-};
-
-type SectionModalState = {
-    section: Section | null;
-    isNew: boolean;
-};
-
-type DeleteSectionConfirmState = {
-    sectionId: string;
-    sectionName: string;
-    cardsCount: number;
-} | null;
-
-function JobApplicationCard({
-    jobApplication,
-    colorKey,
-    onEdit,
-    onRemove,
-    disabled,
-}: {
-    jobApplication: JobApplication;
-    colorKey: string;
-    onEdit: () => void;
-    onRemove: () => void;
-    disabled?: boolean;
-}) {
-    const {attributes, listeners, setNodeRef, isDragging} = useDraggable({
-        id: jobApplication.id,
-        disabled,
-    });
-
-    const displayCompany = jobApplication.company || 'Empresa não informada';
-    const displayPosition = jobApplication.position || 'Cargo não informado';
-
-    return (
-        <Card
-            ref={setNodeRef}
-            $isDragging={isDragging}
-            $colorKey={colorKey}
-            {...(disabled ? {} : {...listeners, ...attributes})}
-        >
-            <h4>{displayCompany}</h4>
-            <p>{displayPosition}</p>
-            <p style={{fontSize: 11, marginTop: 4}}>{formatDateBR(jobApplication.appliedDate)}</p>
-            {!disabled && (
-                <CardActions>
-                    <button type="button" onClick={onEdit}>
-                        Editar
-                    </button>
-                    <RemoveCardBtn type="button" onClick={onRemove}>
-                        Excluir
-                    </RemoveCardBtn>
-                </CardActions>
-            )}
-        </Card>
-    );
-}
-
-function DroppableColumn({
-    section,
-    jobApplications,
-    onAdd,
-    onEdit,
-    onRemove,
-    overId,
-    isEditMode,
-}: {
-    section: Section;
-    jobApplications: JobApplication[];
-    onAdd: () => void;
-    onEdit: (item: JobApplication) => void;
-    onRemove: (id: string) => void;
-    overId: string | null;
-    isEditMode: boolean;
-}) {
-    const {setNodeRef} = useDroppable({id: section.id});
-    const isOver =
-        !isEditMode && (overId === section.id || jobApplications.some((item) => item.id === overId));
-
-    return (
-        <Column ref={setNodeRef} $isOver={isOver} $colorKey={section.colorKey}>
-            <ColumnHeader>
-                <h3>{section.name}</h3>
-                {!isEditMode && (
-                    <AddButton type="button" onClick={onAdd} title="Adicionar">
-                        +
-                    </AddButton>
-                )}
-            </ColumnHeader>
-            <CardsList>
-                {jobApplications.map((item) => (
-                    <JobApplicationCard
-                        key={item.id}
-                        jobApplication={item}
-                        colorKey={section.colorKey}
-                        onEdit={() => onEdit(item)}
-                        onRemove={() => onRemove(item.id)}
-                        disabled={isEditMode}
-                    />
-                ))}
-            </CardsList>
-        </Column>
-    );
-}
-
-function SortableSectionColumn({
-    section,
-    jobApplications,
-    onEditSection,
-    onDeleteSection,
-}: {
-    section: Section;
-    jobApplications: JobApplication[];
-    onEditSection: () => void;
-    onDeleteSection: () => void;
-}) {
-    const {attributes, listeners, setNodeRef, transform, transition, isDragging} = useSortable({
-        id: section.id,
-    });
-
-    const style = transform
-        ? {
-              transform: CSS.Transform.toString(transform),
-              transition,
-          }
-        : undefined;
-
-    return (
-        <SortableSection ref={setNodeRef} style={style} $isDragging={isDragging} {...listeners} {...attributes}>
-            <Column $colorKey={section.colorKey}>
-                <SectionEditHeader>
-                    <h3>{section.name}</h3>
-                    <SectionEditActions
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button type="button" onClick={onEditSection} title="Editar nome">
-                            ✎
-                        </button>
-                        <SectionDeleteBtn type="button" onClick={onDeleteSection} title="Excluir seção">
-                            ✕
-                        </SectionDeleteBtn>
-                    </SectionEditActions>
-                </SectionEditHeader>
-                <CardsList>
-                    {jobApplications.map((item) => (
-                        <Card key={item.id} $colorKey={section.colorKey}>
-                            <h4>{item.company || 'Empresa não informada'}</h4>
-                            <p>{item.position || 'Cargo não informado'}</p>
-                            <p style={{fontSize: 11, marginTop: 4}}>{formatDateBR(item.appliedDate)}</p>
-                        </Card>
-                    ))}
-                </CardsList>
-            </Column>
-        </SortableSection>
-    );
-}
+import {formatDateBR, maskDateBr} from './DashboardScreen.utils';
+import {DashboardScreenBoardColumn} from './DashboardScreen.board-column';
 
 export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> = ({
     controller,
 }) => {
-    const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    );
-
-    const [editModal, setEditModal] = useState<EditModalState>({
-        jobApplication: null,
-        sectionId: null,
-    });
-    const [sectionModal, setSectionModal] = useState<SectionModalState>({
-        section: null,
-        isNew: false,
-    });
-    const [isEditSectionsMode, setIsEditSectionsMode] = useState(false);
-    const [overId, setOverId] = useState<string | null>(null);
-    const [activeId, setActiveId] = useState<string | null>(null);
-    const [deleteSectionConfirm, setDeleteSectionConfirm] = useState<DeleteSectionConfirmState>(null);
-
-    const allJobApplications = controller.states.sections.flatMap(
-        (s) => controller.states.jobApplicationsBySection[s.id] ?? []
-    );
-    const activeJobApplication = activeId
-        ? allJobApplications.find((item) => item.id === activeId)
-        : null;
-
-    const sectionIds = controller.states.sections.map((s) => s.id);
-
-    const openAddModal = (sectionId: string) => {
-        const newItem = controller.actions.addJobApplication(sectionId);
-        setEditModal({jobApplication: newItem, sectionId});
-    };
-
-    const openEditModal = (item: JobApplication) => {
-        setEditModal({jobApplication: item, sectionId: item.sectionId});
-    };
-
-    const closeModal = () => {
-        setEditModal({jobApplication: null, sectionId: null});
-    };
-
-    const openSectionModal = (section: Section | null, isNew: boolean) => {
-        setSectionModal({section, isNew});
-    };
-
-    const closeSectionModal = () => {
-        setSectionModal({section: null, isNew: false});
-    };
-
-    const handleAddSection = () => {
-        const newSection = controller.actions.addSection('Nova seção');
-        openSectionModal(newSection, true);
-    };
-
-    const handleDragStart = (event: DragStartEvent) => {
-        setActiveId(String(event.active.id));
-    };
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const {active, over} = event;
-        const activeIdStr = String(active.id);
-        const overIdStr = over ? String(over.id) : null;
-
-        setActiveId(null);
-        setOverId(null);
-
-        if (isEditSectionsMode && sectionIds.includes(activeIdStr)) {
-            const fromIndex = sectionIds.indexOf(activeIdStr);
-            const toIndex = overIdStr ? sectionIds.indexOf(overIdStr) : -1;
-            if (toIndex >= 0 && fromIndex !== toIndex) {
-                controller.actions.reorderSections(fromIndex, toIndex);
-            }
-        } else if (!isEditSectionsMode && overIdStr) {
-            controller.actions.handleDragEnd(activeIdStr, overIdStr);
-        }
-    };
-
-    const handleDragOver = (event: { over: { id: unknown } | null }) => {
-        setOverId(event.over ? String(event.over.id) : null);
-    };
-
-    const handleSaveEdit = () => {
-        if (!editModal.jobApplication) return;
-        const form = document.getElementById('edit-job-form') as HTMLFormElement;
-        if (!form) return;
-        const formData = new FormData(form);
-        const brDate = String(formData.get('appliedDate') ?? '').trim();
-        const isoDate = brToIso(brDate);
-        const appliedDate = isoDate || editModal.jobApplication.appliedDate;
-        controller.actions.updateJobApplication(editModal.jobApplication.id, {
-            company: String(formData.get('company') ?? ''),
-            position: String(formData.get('position') ?? ''),
-            appliedDate,
-            link: String(formData.get('link') || '') || undefined,
-            notes: String(formData.get('notes') || '') || undefined,
-        });
-        closeModal();
-    };
-
-    const handleSaveSection = () => {
-        if (!sectionModal.section) return;
-        const form = document.getElementById('edit-section-form') as HTMLFormElement;
-        if (!form) return;
-        const formData = new FormData(form);
-        controller.actions.updateSection(sectionModal.section.id, {
-            name: String(formData.get('name') ?? '').trim() || 'Nova seção',
-        });
-        closeSectionModal();
-    };
-
-    const handleDeleteSection = (sectionId: string) => {
-        const section = controller.states.sections.find((s) => s.id === sectionId);
-        const cardsCount = controller.states.jobApplicationsBySection[sectionId]?.length ?? 0;
-        if (cardsCount > 0 && section) {
-            setDeleteSectionConfirm({
-                sectionId,
-                sectionName: section.name,
-                cardsCount,
-            });
-        } else {
-            if (window.confirm('Excluir esta seção?')) {
-                controller.actions.removeSection(sectionId);
-            }
-        }
-    };
-
-    const confirmDeleteSection = () => {
-        if (!deleteSectionConfirm) return;
-        controller.actions.removeSection(deleteSectionConfirm.sectionId);
-        setDeleteSectionConfirm(null);
-    };
+    const s = controller.states;
+    const a = controller.actions;
 
     return (
         <Container>
             <Header>
                 <h1>Controle de Candidaturas</h1>
                 <UserInfo>
-                    <span>{controller.states.userEmail}</span>
+                    <span>{s.userEmail}</span>
                     <HeaderActions>
-                        <Button
-                            variant="outline"
-                            onClick={() => setIsEditSectionsMode(!isEditSectionsMode)}
-                        >
-                            {isEditSectionsMode ? 'Sair do modo edição' : 'Editar seções'}
-                        </Button>
-                        <Button variant="outline" onClick={handleAddSection}>
+                        <Button variant="outline" onClick={a.handleAddSection}>
                             + Nova seção
                         </Button>
-                        <Button variant="outline" onClick={controller.actions.logout}>
+                        <Button variant="outline" onClick={a.logout}>
                             Sair
                         </Button>
                     </HeaderActions>
                 </UserInfo>
             </Header>
 
-            <InstructionNotice>
-                <strong>Como mover vagas:</strong> Clique e segure sobre um card e arraste-o até a seção desejada.
-            </InstructionNotice>
-
-            {isEditSectionsMode && (
-                <InstructionNotice>
-                    <strong>Modo edição de seções:</strong> Arraste as seções para reordenar. Use os ícones para editar o nome ou excluir. Os cards não podem ser movidos neste modo.
-                </InstructionNotice>
-            )}
-
-            <ScrollNotice>
-                <strong>Dica:</strong> Arraste para o lado para ver as demais seções.
-            </ScrollNotice>
+            <HelpSection>
+                <strong>Seções:</strong> use <strong>+ Nova seção</strong>, preencha o nome e{' '}
+                <strong>Salvar</strong> para criar. Para editar o nome ou excluir, use os ícones na coluna
+                (✎ e ✕). Para <strong>mudar a ordem</strong> das seções, arraste pelo <strong>título</strong>{' '}
+                da coluna. <strong>Candidaturas:</strong> o <strong>+</strong> na coluna abre o formulário; a
+                vaga só é criada ao <strong>Salvar</strong>. Para <strong>mover</strong> uma candidatura,
+                arraste o card até outra seção.
+            </HelpSection>
 
             <DndContext
-                sensors={sensors}
-                collisionDetection={isEditSectionsMode ? closestCenter : pointerWithin}
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
-                onDragOver={handleDragOver}
+                sensors={s.sensors}
+                collisionDetection={s.collisionDetection}
+                onDragStart={a.handleDragStart}
+                onDragEnd={a.handleDragEnd}
+                onDragOver={a.handleDragOver}
             >
-                <Board>
-                    {isEditSectionsMode ? (
-                        <SortableContext items={sectionIds} strategy={horizontalListSortingStrategy}>
-                            {controller.states.sections.map((section) => (
-                                <SortableSectionColumn
+                <BoardShell>
+                    <Board>
+                        <SortableContext items={s.sectionIds} strategy={horizontalListSortingStrategy}>
+                            {s.sections.map((section) => (
+                                <DashboardScreenBoardColumn
                                     key={section.id}
                                     section={section}
-                                    jobApplications={controller.states.jobApplicationsBySection[section.id] ?? []}
-                                    onEditSection={() => openSectionModal(section, false)}
-                                    onDeleteSection={() => handleDeleteSection(section.id)}
+                                    jobApplications={s.jobApplicationsBySection[section.id] ?? []}
+                                    onAdd={() => a.openAddModal(section.id)}
+                                    onEdit={a.openEditModal}
+                                    onRemove={a.removeJobApplication}
+                                    onEditSection={() => a.openSectionModal(section, false)}
+                                    onDeleteSection={() => a.handleDeleteSection(section.id)}
+                                    overId={s.overId}
                                 />
                             ))}
                         </SortableContext>
-                    ) : (
-                        <>
-                            {controller.states.sections.map((section) => (
-                                <DroppableColumn
-                                    key={section.id}
-                                    section={section}
-                                    jobApplications={controller.states.jobApplicationsBySection[section.id] ?? []}
-                                    onAdd={() => openAddModal(section.id)}
-                                    onEdit={openEditModal}
-                                    onRemove={controller.actions.removeJobApplication}
-                                    overId={overId}
-                                    isEditMode={false}
-                                />
-                            ))}
-                        </>
-                    )}
-                </Board>
+                    </Board>
 
-                {!isEditSectionsMode && (
                     <DragOverlay>
-                        {activeJobApplication ? (
+                        {s.activeJobApplication ? (
                             <DragOverlayCard>
                                 <h4>
-                                    {activeJobApplication.company || 'Empresa não informada'}
+                                    {s.activeJobApplication.company || 'Empresa não informada'}
                                 </h4>
-                                <p>{activeJobApplication.position || 'Cargo não informado'}</p>
+                                <p>{s.activeJobApplication.position || 'Cargo não informado'}</p>
                                 <p style={{fontSize: 11, marginTop: 4}}>
-                                    {formatDateBR(activeJobApplication.appliedDate)}
+                                    {formatDateBR(s.activeJobApplication.appliedDate)}
                                 </p>
+                            </DragOverlayCard>
+                        ) : s.activeSection ? (
+                            <DragOverlayCard>
+                                <h4>{s.activeSection.name}</h4>
+                                <p style={{fontSize: 12, color: 'var(--text-secondary)'}}>Seção</p>
                             </DragOverlayCard>
                         ) : null}
                     </DragOverlay>
-                )}
+                </BoardShell>
             </DndContext>
 
-            {editModal.jobApplication && (
-                <ModalOverlay onClick={closeModal}>
+            {s.isJobEditModalOpen && (
+                <ModalOverlay onClick={a.closeModal}>
                     <ModalContent onClick={(e) => e.stopPropagation()}>
-                        <h3>
-                            {editModal.jobApplication.company ? 'Editar candidatura' : 'Nova candidatura'}
-                        </h3>
-                        <form id="edit-job-form" onSubmit={(e) => e.preventDefault()}>
+                        <h3>{s.editModal.isNew ? 'Nova candidatura' : 'Editar candidatura'}</h3>
+                        <form
+                            id="edit-job-form"
+                            key={s.editModal.jobApplication?.id ?? `new-job-${s.editModal.sectionId}`}
+                            onSubmit={(e) => e.preventDefault()}
+                        >
                             <FormRow>
                                 <label>Empresa</label>
                                 <input
                                     name="company"
-                                    defaultValue={editModal.jobApplication.company}
+                                    defaultValue={s.editModal.jobApplication?.company ?? ''}
                                     placeholder="Nome da empresa"
                                 />
                             </FormRow>
@@ -485,18 +129,21 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                 <label>Cargo</label>
                                 <input
                                     name="position"
-                                    defaultValue={editModal.jobApplication.position}
+                                    defaultValue={s.editModal.jobApplication?.position ?? ''}
                                     placeholder="Cargo desejado"
                                 />
                             </FormRow>
                             <FormRow>
                                 <label>Data da candidatura</label>
                                 <input
-                                    key={editModal.jobApplication.id}
                                     name="appliedDate"
                                     type="text"
                                     placeholder="DD/MM/AAAA"
-                                    defaultValue={formatDateBR(editModal.jobApplication.appliedDate)}
+                                    defaultValue={
+                                        s.editModal.jobApplication
+                                            ? formatDateBR(s.editModal.jobApplication.appliedDate)
+                                            : formatDateBR(s.newJobDefaultDateIso)
+                                    }
                                     onInput={(e) => {
                                         e.currentTarget.value = maskDateBr(e.currentTarget.value);
                                     }}
@@ -507,7 +154,7 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                 <input
                                     name="link"
                                     type="url"
-                                    defaultValue={editModal.jobApplication.link ?? ''}
+                                    defaultValue={s.editModal.jobApplication?.link ?? ''}
                                     placeholder="https://..."
                                 />
                             </FormRow>
@@ -515,15 +162,15 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                 <label>Observações (opcional)</label>
                                 <textarea
                                     name="notes"
-                                    defaultValue={editModal.jobApplication.notes ?? ''}
+                                    defaultValue={s.editModal.jobApplication?.notes ?? ''}
                                     placeholder="Notas sobre a vaga..."
                                 />
                             </FormRow>
                             <ModalActions>
-                                <Button variant="outline" type="button" onClick={closeModal}>
+                                <Button variant="outline" type="button" onClick={a.closeModal}>
                                     Cancelar
                                 </Button>
-                                <Button type="button" onClick={handleSaveEdit}>
+                                <Button type="button" onClick={a.handleSaveEdit}>
                                     Salvar
                                 </Button>
                             </ModalActions>
@@ -532,24 +179,32 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                 </ModalOverlay>
             )}
 
-            {sectionModal.section && (
-                <ModalOverlay onClick={closeSectionModal}>
+            {s.isSectionModalOpen && (
+                <ModalOverlay onClick={a.closeSectionModal}>
                     <ModalContent onClick={(e) => e.stopPropagation()}>
-                        <h3>{sectionModal.isNew ? 'Nova seção' : 'Editar seção'}</h3>
-                        <form id="edit-section-form" onSubmit={(e) => e.preventDefault()}>
+                        <h3>
+                            {s.sectionModal.isNew && !s.sectionModal.section
+                                ? 'Nova seção'
+                                : 'Editar seção'}
+                        </h3>
+                        <form
+                            id="edit-section-form"
+                            key={s.sectionModal.section?.id ?? 'new-section'}
+                            onSubmit={(e) => e.preventDefault()}
+                        >
                             <FormRow>
                                 <label>Nome da seção</label>
                                 <input
                                     name="name"
-                                    defaultValue={sectionModal.section.name}
+                                    defaultValue={s.sectionModal.section?.name ?? ''}
                                     placeholder="Ex: Vagas Candidatadas"
                                 />
                             </FormRow>
                             <ModalActions>
-                                <Button variant="outline" type="button" onClick={closeSectionModal}>
+                                <Button variant="outline" type="button" onClick={a.closeSectionModal}>
                                     Cancelar
                                 </Button>
-                                <Button type="button" onClick={handleSaveSection}>
+                                <Button type="button" onClick={a.handleSaveSection}>
                                     Salvar
                                 </Button>
                             </ModalActions>
@@ -558,26 +213,30 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                 </ModalOverlay>
             )}
 
-            {deleteSectionConfirm && (
-                <ModalOverlay onClick={() => setDeleteSectionConfirm(null)}>
+            {s.deleteSectionConfirm && (
+                <ModalOverlay onClick={a.cancelDeleteSection}>
                     <DeleteModalContent onClick={(e) => e.stopPropagation()}>
                         <h3>Excluir seção</h3>
                         <DeleteModalBody>
                             <DeleteModalWarning>
-                                Existem {deleteSectionConfirm.cardsCount} vaga{deleteSectionConfirm.cardsCount === 1 ? '' : 's'} cadastrada{deleteSectionConfirm.cardsCount === 1 ? '' : 's'} na seção <DeleteModalSectionName>"{deleteSectionConfirm.sectionName}"</DeleteModalSectionName>.
+                                Existem {s.deleteSectionConfirm.cardsCount} vaga
+                                {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} cadastrada
+                                {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} na seção{' '}
+                                <DeleteModalSectionName>
+                                    &quot;{s.deleteSectionConfirm.sectionName}&quot;
+                                </DeleteModalSectionName>
+                                .
                             </DeleteModalWarning>
                             <DeleteModalWarning>
                                 Se você excluir a seção, todas as vagas atreladas a ela serão perdidas.
                             </DeleteModalWarning>
-                            <DeleteModalConfirm>
-                                Deseja realmente prosseguir?
-                            </DeleteModalConfirm>
+                            <DeleteModalConfirm>Deseja realmente prosseguir?</DeleteModalConfirm>
                         </DeleteModalBody>
                         <DeleteModalActions>
-                            <Button variant="outline" type="button" onClick={() => setDeleteSectionConfirm(null)}>
+                            <Button variant="outline" type="button" onClick={a.cancelDeleteSection}>
                                 Cancelar
                             </Button>
-                            <Button type="button" onClick={confirmDeleteSection}>
+                            <Button type="button" onClick={a.confirmDeleteSection}>
                                 Prosseguir
                             </Button>
                         </DeleteModalActions>

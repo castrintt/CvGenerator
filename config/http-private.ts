@@ -2,6 +2,7 @@ import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { AppConfig } from '../business/shared/config/app.config';
 import { ApiRoutes } from '../business/shared/config/api-routes.config';
+import { showApiErrorToast } from './api-error';
 import { httpPublic } from './http-public';
 
 interface RetryableConfig extends InternalAxiosRequestConfig {
@@ -34,11 +35,17 @@ export const httpPrivate = axios.create({
 httpPrivate.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    if (error.response?.status !== 401) return Promise.reject(error);
+    if (error.response?.status !== 401) {
+      showApiErrorToast(error);
+      return Promise.reject(error);
+    }
 
     const originalConfig = error.config as RetryableConfig;
 
-    if (originalConfig._retry) return Promise.reject(error);
+    if (originalConfig._retry) {
+      showApiErrorToast(error);
+      return Promise.reject(error);
+    }
 
     if (isRefreshing) {
       return new Promise<void>((resolve, reject) => {

@@ -3,4 +3,5 @@ import type { AuthenticatedUserDto, LoginCredentialsDto, RegisterCredentialsDto 
 export interface IAuthenticationGateway {
   login(dto: LoginCredentialsDto): Promise<AuthenticatedUserDto>;
   register(dto: RegisterCredentialsDto): Promise<void>;
+  logout(): Promise<void>;
 }

@@ -18,4 +18,8 @@ export class AuthenticationGateway implements IAuthenticationGateway {
   async register(dto: RegisterCredentialsDto): Promise<void> {
     await httpPublic.post(ApiRoutes.user.create, dto);
   }
+
+  async logout(): Promise<void> {
+    await httpPublic.post(ApiRoutes.auth.logout);
+  }
 }

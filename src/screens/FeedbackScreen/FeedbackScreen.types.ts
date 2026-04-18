@@ -10,6 +10,10 @@ export const feedbackSchema = z.object({
 
 export type FeedbackData = z.infer<typeof feedbackSchema>;
 
+export type FeedbackScreenResumeTemplateProps = {
+    resumeData: ResumeData;
+};
+
 export type ResumeControllerInjectTypes = {
     resumeService: IResumeService
 
