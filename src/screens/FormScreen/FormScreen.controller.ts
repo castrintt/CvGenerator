@@ -2,15 +2,14 @@ import {useFieldArray, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate} from 'react-router-dom';
 import {FormData, formSchema} from './FormScreen.types';
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useReducer} from "react";
 import {useResumeContext} from "../../context/ResumeContext.tsx";
+import {formScreenReducer, initialFormScreenUiState} from './FormScreen.reducer';
 
 
 export const UseFormScreenController = () => {
-    const [activeSection, setActiveSection] = useState('personal');
-    const [previewTemplateId, setPreviewTemplateId] = useState<number | null>(null);
-    const [actionModalTemplateId, setActionModalTemplateId] = useState<number | null>(null);
-    const [scale, setScale] = useState(1);
+    const [ui, dispatch] = useReducer(formScreenReducer, initialFormScreenUiState);
+    const {activeSection, previewTemplateId, actionModalTemplateId, scale} = ui;
 
     const {setResumeData} = useResumeContext()
 
@@ -109,7 +108,7 @@ export const UseFormScreenController = () => {
     useEffect(() => {
         const handleScroll = () => {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 50) {
-                setActiveSection('template');
+                dispatch({type: 'SET_ACTIVE_SECTION', section: 'template'});
                 return;
             }
 
@@ -132,7 +131,7 @@ export const UseFormScreenController = () => {
                     if (rect.top <= offset) current = section;
                 }
             }
-            setActiveSection(current);
+            dispatch({type: 'SET_ACTIVE_SECTION', section: current});
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -158,7 +157,7 @@ export const UseFormScreenController = () => {
             const scaleWidth = vw / a4WidthPx;
 
             const newScale = Math.min(scaleHeight, scaleWidth, 1);
-            setScale(newScale);
+            dispatch({type: 'SET_SCALE', scale: newScale});
         };
 
         window.addEventListener('resize', handleResize);
@@ -168,29 +167,26 @@ export const UseFormScreenController = () => {
     }, [previewTemplateId]);
 
     const openActionModal = (templateId: number) => {
-        setActionModalTemplateId(templateId);
+        dispatch({type: 'OPEN_ACTION_MODAL', templateId});
     };
 
     const closeActionModal = () => {
-        setActionModalTemplateId(null);
+        dispatch({type: 'CLOSE_ACTION_MODAL'});
     };
 
     const selectTemplateFromModal = () => {
         if (actionModalTemplateId !== null) {
             setValue('selectedTemplate', actionModalTemplateId);
         }
-        closeActionModal();
+        dispatch({type: 'CLOSE_ACTION_MODAL'});
     };
 
     const openPreviewFromModal = () => {
-        if (actionModalTemplateId !== null) {
-            setPreviewTemplateId(actionModalTemplateId);
-        }
-        closeActionModal();
+        dispatch({type: 'OPEN_PREVIEW_FROM_MODAL'});
     };
 
     const closePreview = () => {
-        setPreviewTemplateId(null);
+        dispatch({type: 'CLOSE_PREVIEW'});
     };
 
     return {

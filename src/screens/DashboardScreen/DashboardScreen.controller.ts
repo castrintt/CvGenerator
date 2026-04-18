@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useReducer} from 'react';
 import {useNavigate} from 'react-router-dom';
 import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
 import {PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
@@ -13,11 +13,10 @@ import {
     isJobDragId,
     resolveDropSectionId,
 } from './DashboardScreen.utils';
-import type {
-    DeleteSectionConfirmState,
-    EditModalState,
-    SectionModalState,
-} from './DashboardScreen.types';
+import {
+    dashboardScreenReducer,
+    initialDashboardScreenUiState,
+} from './DashboardScreen.reducer';
 
 export const UseDashboardScreenController = () => {
     const navigate = useNavigate();
@@ -36,19 +35,11 @@ export const UseDashboardScreenController = () => {
         useSensor(PointerSensor, {activationConstraint: {distance: 8}}),
     );
 
-    const [editModal, setEditModal] = useState<EditModalState>({
-        jobApplication: null,
-        sectionId: null,
-        isNew: false,
-    });
-    const [sectionModal, setSectionModal] = useState<SectionModalState>({
-        section: null,
-        isNew: false,
-    });
-    const [overId, setOverId] = useState<string | null>(null);
-    const [activeId, setActiveId] = useState<string | null>(null);
-    const [deleteSectionConfirm, setDeleteSectionConfirm] =
-        useState<DeleteSectionConfirmState>(null);
+    const [ui, dispatch] = useReducer(
+        dashboardScreenReducer,
+        initialDashboardScreenUiState,
+    );
+    const {editModal, sectionModal, overId, activeId, deleteSectionConfirm} = ui;
 
     const logout = async () => {
         await authLogout();
@@ -79,23 +70,23 @@ export const UseDashboardScreenController = () => {
             : null;
 
     const openAddModal = (sectionId: string) => {
-        setEditModal({jobApplication: null, sectionId, isNew: true});
+        dispatch({type: 'OPEN_EDIT_MODAL_ADD', sectionId});
     };
 
     const openEditModal = (item: JobApplication) => {
-        setEditModal({jobApplication: item, sectionId: item.sectionId, isNew: false});
+        dispatch({type: 'OPEN_EDIT_MODAL_EDIT', jobApplication: item});
     };
 
     const closeModal = () => {
-        setEditModal({jobApplication: null, sectionId: null, isNew: false});
+        dispatch({type: 'CLOSE_EDIT_MODAL'});
     };
 
     const openSectionModal = (section: Section | null, isNew: boolean) => {
-        setSectionModal({section, isNew});
+        dispatch({type: 'OPEN_SECTION_MODAL', section, isNew});
     };
 
     const closeSectionModal = () => {
-        setSectionModal({section: null, isNew: false});
+        dispatch({type: 'CLOSE_SECTION_MODAL'});
     };
 
     const handleAddSection = () => {
@@ -103,7 +94,7 @@ export const UseDashboardScreenController = () => {
     };
 
     const handleDragStart = (event: DragStartEvent) => {
-        setActiveId(String(event.active.id));
+        dispatch({type: 'DRAG_START', activeId: String(event.active.id)});
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -112,8 +103,7 @@ export const UseDashboardScreenController = () => {
         const activeType = active.data.current?.type as string | undefined;
         const overIdStr = over ? String(over.id) : null;
 
-        setActiveId(null);
-        setOverId(null);
+        dispatch({type: 'DRAG_END_CLEAR'});
 
         if (activeType === 'section' && sectionIds.includes(activeIdStr)) {
             const fromIndex = sectionIds.indexOf(activeIdStr);
@@ -137,7 +127,10 @@ export const UseDashboardScreenController = () => {
     };
 
     const handleDragOver = (event: {over: {id: unknown} | null}) => {
-        setOverId(event.over ? String(event.over.id) : null);
+        dispatch({
+            type: 'DRAG_OVER',
+            overId: event.over ? String(event.over.id) : null,
+        });
     };
 
     const handleSaveEdit = () => {
@@ -195,10 +188,13 @@ export const UseDashboardScreenController = () => {
         const section = orderedSections.find((s) => s.id === sectionId);
         const cardsCount = jobApplicationsBySection[sectionId]?.length ?? 0;
         if (cardsCount > 0 && section) {
-            setDeleteSectionConfirm({
-                sectionId,
-                sectionName: section.name,
-                cardsCount,
+            dispatch({
+                type: 'SET_DELETE_SECTION_CONFIRM',
+                payload: {
+                    sectionId,
+                    sectionName: section.name,
+                    cardsCount,
+                },
             });
         } else {
             if (window.confirm('Excluir esta seção?')) {
@@ -212,11 +208,11 @@ export const UseDashboardScreenController = () => {
         const {sectionId} = deleteSectionConfirm;
         removeAllFromSection(sectionId);
         removeSection(sectionId);
-        setDeleteSectionConfirm(null);
+        dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
     };
 
     const cancelDeleteSection = () => {
-        setDeleteSectionConfirm(null);
+        dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
     };
 
     const isSectionModalOpen = sectionModal.isNew || sectionModal.section !== null;
