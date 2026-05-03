@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ElegantTemplate } from '../../../src/components/ResumeTemplates/ElegantTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData, ResumeTemplate } from '../../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -38,7 +38,7 @@ const mockData: ResumeData = {
             duration: '40h'
         }
     ],
-    selectedTemplate: 7
+    selectedTemplate: ResumeTemplate.Elegant
 };
 
 describe('ElegantTemplate', () => {

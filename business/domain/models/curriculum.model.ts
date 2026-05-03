@@ -35,6 +35,17 @@ export interface Course {
     duration?: string;
 }
 
+export enum ResumeTemplate {
+    Classic       = 1,
+    ModernSidebar = 2,
+    Minimalist    = 3,
+    Traditional   = 4,
+    Creative      = 5,
+    Professional  = 6,
+    Elegant       = 7,
+    Tech          = 8,
+}
+
 export interface ResumeData {
     personalInfo: PersonalInfo;
     summary: string;
@@ -42,5 +53,5 @@ export interface ResumeData {
     education: Education[];
     schooling: Schooling[];
     courses: Course[];
-    selectedTemplate: number;
+    selectedTemplate: ResumeTemplate;
 }

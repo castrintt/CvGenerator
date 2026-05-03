@@ -1,8 +1,8 @@
-import type {CollisionDetection} from '@dnd-kit/core';
-import type {SensorDescriptor} from '@dnd-kit/core';
-import type {UseFormReturn, SubmitHandler} from 'react-hook-form';
-import type {JobApplication} from '../../../business/domain/models/jobApplication.model';
-import type {Section} from '../../../business/domain/models/section.model';
+import type { CollisionDetection } from '@dnd-kit/core';
+import type { SensorDescriptor } from '@dnd-kit/core';
+import type { UseFormReturn, SubmitHandler } from 'react-hook-form';
+import type { JobApplication } from '../../../business/domain/models/jobApplication.model';
+import type { Section } from '../../../business/domain/models/section.model';
 
 export type EditModalState = {
     jobApplication: JobApplication | null;
@@ -60,7 +60,7 @@ export type DashboardScreenController = {
         handleAddSection: () => void;
         handleDragStart: (event: import('@dnd-kit/core').DragStartEvent) => void;
         handleDragEnd: (event: import('@dnd-kit/core').DragEndEvent) => void;
-        handleDragOver: (event: {over: {id: unknown} | null}) => void;
+        handleDragOver: (event: { over: { id: unknown } | null }) => void;
         onSubmitJobApplicationForm: SubmitHandler<JobApplicationFormValues>;
         onSubmitSectionForm: SubmitHandler<SectionFormValues>;
         handleDeleteSection: (sectionId: string) => void;

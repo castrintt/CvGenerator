@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import React from 'react';
+import {ResumeTemplate} from '../../../business/domain/models/curriculum.model';
 import type {ResumeData} from '../../../business/domain/models/curriculum.model';
 
 export const personalInfoSchema = z.object({
@@ -70,25 +71,25 @@ export const formSchema = z.object({
     education: z.array(educationSchema).optional(),
     schooling: z.array(schoolingSchema).optional(),
     courses: z.array(courseSchema).optional(),
-    selectedTemplate: z.number().min(1).max(8),
+    selectedTemplate: z.nativeEnum(ResumeTemplate),
 });
 
 export type FormData = z.infer<typeof formSchema>;
 
 export type FormScreenTemplateNameOption = {
-    id: number;
+    id: ResumeTemplate;
     name: string;
 };
 
 export const FORM_SCREEN_TEMPLATE_NAMES: FormScreenTemplateNameOption[] = [
-    {id: 1, name: 'Clássico'},
-    {id: 2, name: 'Moderno Lateral'},
-    {id: 3, name: 'Minimalista'},
-    {id: 4, name: 'Tradicional'},
-    {id: 5, name: 'Criativo'},
-    {id: 6, name: 'Profissional'},
-    {id: 7, name: 'Elegante'},
-    {id: 8, name: 'Tech (Dark)'},
+    {id: ResumeTemplate.Classic,       name: 'Clássico'},
+    {id: ResumeTemplate.ModernSidebar, name: 'Moderno Lateral'},
+    {id: ResumeTemplate.Minimalist,    name: 'Minimalista'},
+    {id: ResumeTemplate.Traditional,   name: 'Tradicional'},
+    {id: ResumeTemplate.Creative,      name: 'Criativo'},
+    {id: ResumeTemplate.Professional,  name: 'Profissional'},
+    {id: ResumeTemplate.Elegant,       name: 'Elegante'},
+    {id: ResumeTemplate.Tech,          name: 'Tech (Dark)'},
 ];
 
 export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
@@ -130,7 +131,7 @@ export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
         {name: 'Excel Avançado', institution: 'Curso Online', duration: '40h'},
         {name: 'Inglês Intermediário', institution: 'Escola de Idiomas', duration: '2 anos'},
     ],
-    selectedTemplate: 1,
+    selectedTemplate: ResumeTemplate.Classic,
 };
 
 export type FormScreenComponentProps = {
@@ -152,7 +153,7 @@ export type FormScreenComponentProps = {
             setTemplate: (id: number) => void;
             watch: any;
             setValue: any;
-            openActionModal: (templateId: number) => void;
+            openActionModal: (templateId: ResumeTemplate) => void;
             closeActionModal: () => void;
             selectTemplateFromModal: () => void;
             openPreviewFromModal: () => void;
@@ -165,9 +166,9 @@ export type FormScreenComponentProps = {
             educationFields: any[];
             schoolingFields: any[];
             courseFields: any[];
-            selectedTemplate: number;
-            previewTemplateId: number | null;
-            actionModalTemplateId: number | null;
+            selectedTemplate: ResumeTemplate;
+            previewTemplateId: ResumeTemplate | null;
+            actionModalTemplateId: ResumeTemplate | null;
             scale: number;
         };
     }

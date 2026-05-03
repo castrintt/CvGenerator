@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { TraditionalTemplate } from '../../../src/components/ResumeTemplates/TraditionalTemplate';
-import { ResumeData } from '../../../business/domain/models/curriculum.model';
+import { ResumeData, ResumeTemplate } from '../../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 const mockData: ResumeData = {
@@ -38,7 +38,7 @@ const mockData: ResumeData = {
             duration: '40h'
         }
     ],
-    selectedTemplate: 4
+    selectedTemplate: ResumeTemplate.Traditional
 };
 
 describe('TraditionalTemplate', () => {

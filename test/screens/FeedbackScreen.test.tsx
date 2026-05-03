@@ -4,7 +4,7 @@ import { FeedbackScreen } from '../../src/screens/FeedbackScreen/FeedbackScreen'
 import { ResumeProvider, useResumeContext } from '../../src/context/ResumeContext';
 import { ThemeProvider } from '../../src/context/ThemeContext';
 import { BrowserRouter } from 'react-router-dom';
-import { ResumeData } from '../../business/domain/models/curriculum.model';
+import { ResumeData, ResumeTemplate } from '../../business/domain/models/curriculum.model';
 import '@testing-library/jest-dom';
 
 // Mock ResumeService
@@ -33,7 +33,7 @@ const ResumeDataSetter = ({ children }: { children: React.ReactNode }) => {
             education: [],
             schooling: [],
             courses: [],
-            selectedTemplate: 1
+            selectedTemplate: ResumeTemplate.Classic
         } as ResumeData);
     }, [setResumeData]);
     return <>{children}</>;

@@ -17,19 +17,23 @@ import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplat
 import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
 import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
 import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
-const RenderTemplatePreview = (templateId: number) => {
+import {ResumeTemplate, type ResumeData} from '../../../business/domain/models/curriculum.model';
+
+const RESUME_TEMPLATE_COMPONENT_MAP: Record<ResumeTemplate, React.FC<{ data: ResumeData }>> = {
+    [ResumeTemplate.Classic]:       ClassicTemplate,
+    [ResumeTemplate.ModernSidebar]: ModernSidebarTemplate,
+    [ResumeTemplate.Minimalist]:    MinimalistTemplate,
+    [ResumeTemplate.Traditional]:   TraditionalTemplate,
+    [ResumeTemplate.Creative]:      CreativeTemplate,
+    [ResumeTemplate.Professional]:  ProfessionalTemplate,
+    [ResumeTemplate.Elegant]:       ElegantTemplate,
+    [ResumeTemplate.Tech]:          TechTemplate,
+};
+
+const RenderTemplatePreview = (templateId: ResumeTemplate) => {
     const data = {...FORM_SCREEN_PREVIEW_FAKE_DATA, selectedTemplate: templateId};
-    switch (templateId) {
-        case 1: return <ClassicTemplate data={data}/>;
-        case 2: return <ModernSidebarTemplate data={data}/>;
-        case 3: return <MinimalistTemplate data={data}/>;
-        case 4: return <TraditionalTemplate data={data}/>;
-        case 5: return <CreativeTemplate data={data}/>;
-        case 6: return <ProfessionalTemplate data={data}/>;
-        case 7: return <ElegantTemplate data={data}/>;
-        case 8: return <TechTemplate data={data}/>;
-        default: return <ClassicTemplate data={data}/>;
-    }
+    const TemplateComponent = RESUME_TEMPLATE_COMPONENT_MAP[templateId] ?? ClassicTemplate;
+    return <TemplateComponent data={data}/>;
 };
 
 export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({controller}) => {

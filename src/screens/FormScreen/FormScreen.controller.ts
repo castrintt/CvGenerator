@@ -2,6 +2,7 @@ import {useFieldArray, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate} from 'react-router-dom';
 import {FormData, formSchema} from './FormScreen.types';
+import {ResumeTemplate} from '../../../business/domain/models/curriculum.model';
 import {useEffect, useReducer} from "react";
 import {useResumeContext} from "../../context/ResumeContext.tsx";
 import {formScreenReducer, initialFormScreenUiState} from './FormScreen.reducer';
@@ -29,7 +30,7 @@ export const UseFormScreenController = () => {
             education: [],
             schooling: [],
             courses: [],
-            selectedTemplate: 1
+            selectedTemplate: ResumeTemplate.Classic
         }
     });
 
@@ -129,7 +130,7 @@ export const UseFormScreenController = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, [previewTemplateId]);
 
-    const openActionModal = (templateId: number) => {
+    const openActionModal = (templateId: ResumeTemplate) => {
         dispatch({type: 'OPEN_ACTION_MODAL', templateId});
     };
 

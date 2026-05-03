@@ -1,9 +1,9 @@
-import React, { createContext, ReactNode, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { container } from '../../business/ioc/ioc.config';
-import { CategorySymbols } from '../../business/ioc/symbols/category.symbols';
 import type { ICategoryService } from '../../business/domain/interfaces/i-category.service';
 import type { Section } from '../../business/domain/models/section.model';
+import { container } from '../../business/ioc/ioc.config';
+import { CategorySymbols } from '../../business/ioc/symbols/category.symbols';
 import { selectUserId } from '../store/auth.slice';
 
 interface SectionsContextType {

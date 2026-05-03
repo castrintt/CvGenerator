@@ -1,7 +1,9 @@
+import {ResumeTemplate} from '../../../business/domain/models/curriculum.model';
+
 export type FormScreenUiState = {
     activeSection: string;
-    previewTemplateId: number | null;
-    actionModalTemplateId: number | null;
+    previewTemplateId: ResumeTemplate | null;
+    actionModalTemplateId: ResumeTemplate | null;
     scale: number;
 };
 
@@ -14,7 +16,7 @@ export const initialFormScreenUiState: FormScreenUiState = {
 
 export type FormScreenAction =
     | {type: 'SET_ACTIVE_SECTION'; section: string}
-    | {type: 'OPEN_ACTION_MODAL'; templateId: number}
+    | {type: 'OPEN_ACTION_MODAL'; templateId: ResumeTemplate}
     | {type: 'CLOSE_ACTION_MODAL'}
     | {type: 'OPEN_PREVIEW_FROM_MODAL'}
     | {type: 'CLOSE_PREVIEW'}

@@ -1,34 +1,37 @@
 import React from 'react';
-import {Container, DownloadSection, FeedbackForm, FormatOption, FormatSelector, PreviewArea, ResumePreview, Sidebar, SuccessMessage, TextArea, Title} from './FeedbackScreen.styles';
-import {Button} from '../../components/Button/Button';
-import {ClassicTemplate} from '../../components/ResumeTemplates/ClassicTemplate';
-import {ModernSidebarTemplate} from '../../components/ResumeTemplates/ModernSidebarTemplate';
-import {MinimalistTemplate} from '../../components/ResumeTemplates/MinimalistTemplate';
-import {TraditionalTemplate} from '../../components/ResumeTemplates/TraditionalTemplate';
-import {CreativeTemplate} from '../../components/ResumeTemplates/CreativeTemplate';
-import {ProfessionalTemplate} from '../../components/ResumeTemplates/ProfessionalTemplate';
-import {ElegantTemplate} from '../../components/ResumeTemplates/ElegantTemplate';
-import {TechTemplate} from '../../components/ResumeTemplates/TechTemplate';
+import { Button } from '../../components/Button/Button';
+import { ClassicTemplate } from '../../components/ResumeTemplates/ClassicTemplate';
+import { CreativeTemplate } from '../../components/ResumeTemplates/CreativeTemplate';
+import { ElegantTemplate } from '../../components/ResumeTemplates/ElegantTemplate';
+import { MinimalistTemplate } from '../../components/ResumeTemplates/MinimalistTemplate';
+import { ModernSidebarTemplate } from '../../components/ResumeTemplates/ModernSidebarTemplate';
+import { ProfessionalTemplate } from '../../components/ResumeTemplates/ProfessionalTemplate';
+import { TechTemplate } from '../../components/ResumeTemplates/TechTemplate';
+import { TraditionalTemplate } from '../../components/ResumeTemplates/TraditionalTemplate';
+import { ResumeTemplate, type ResumeData } from '../../../business/domain/models/curriculum.model';
+import { Container, DownloadSection, FeedbackForm, FormatOption, FormatSelector, PreviewArea, ResumePreview, Sidebar, SuccessMessage, TextArea, Title } from './FeedbackScreen.styles';
 import type {
     FeedbackScreenComponentProps,
     FeedbackScreenResumeTemplateProps,
 } from './FeedbackScreen.types';
 
-const RenderTemplate: React.FC<FeedbackScreenResumeTemplateProps> = ({resumeData}) => {
-    switch (resumeData.selectedTemplate) {
-        case 1: return <ClassicTemplate data={resumeData}/>;
-        case 2: return <ModernSidebarTemplate data={resumeData}/>;
-        case 3: return <MinimalistTemplate data={resumeData}/>;
-        case 4: return <TraditionalTemplate data={resumeData}/>;
-        case 5: return <CreativeTemplate data={resumeData}/>;
-        case 6: return <ProfessionalTemplate data={resumeData}/>;
-        case 7: return <ElegantTemplate data={resumeData}/>;
-        case 8: return <TechTemplate data={resumeData}/>;
-        default: return <ClassicTemplate data={resumeData}/>;
-    }
+const RESUME_TEMPLATE_COMPONENT_MAP: Record<ResumeTemplate, React.FC<{ data: ResumeData }>> = {
+    [ResumeTemplate.Classic]:       ClassicTemplate,
+    [ResumeTemplate.ModernSidebar]: ModernSidebarTemplate,
+    [ResumeTemplate.Minimalist]:    MinimalistTemplate,
+    [ResumeTemplate.Traditional]:   TraditionalTemplate,
+    [ResumeTemplate.Creative]:      CreativeTemplate,
+    [ResumeTemplate.Professional]:  ProfessionalTemplate,
+    [ResumeTemplate.Elegant]:       ElegantTemplate,
+    [ResumeTemplate.Tech]:          TechTemplate,
 };
 
-export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = ({controller}) => {
+const ResumeTemplateRenderer: React.FC<FeedbackScreenResumeTemplateProps> = ({ resumeData }) => {
+    const TemplateComponent = RESUME_TEMPLATE_COMPONENT_MAP[resumeData.selectedTemplate] ?? ClassicTemplate;
+    return <TemplateComponent data={resumeData} />;
+};
+
+export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = ({ controller }) => {
     if (!controller.states.resumeData) return <div>Nenhum dado de currículo encontrado. Por favor, volte e preencha o
         formulário.</div>;
     return (
@@ -71,7 +74,7 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
                                 variant="outline"
                                 fullWidth
                                 onClick={controller.actions.goToCreateAnother}
-                                style={{marginTop: 16}}
+                                style={{ marginTop: 16 }}
                             >
                                 Cadastrar outro currículo
                             </Button>
@@ -85,7 +88,7 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
                             {...controller.actions.register('feedback')}
                         />
                         {controller.states.errors.feedback &&
-                         <span style={{color: '#EB5757'}}>{controller.states.errors.feedback.message}</span>}
+                            <span style={{ color: '#EB5757' }}>{controller.states.errors.feedback.message}</span>}
 
                         <Button type="submit" disabled={controller.states.isSubmitting}>
                             {controller.states.isSubmitting ? 'Enviando...' : 'Enviar Feedback'}
@@ -96,7 +99,7 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
 
             <PreviewArea>
                 <ResumePreview id="resume-preview">
-                    <RenderTemplate resumeData={controller.states.resumeData} />
+                    <ResumeTemplateRenderer resumeData={controller.states.resumeData} />
                 </ResumePreview>
             </PreviewArea>
         </Container>

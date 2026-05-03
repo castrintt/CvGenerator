@@ -1,5 +1,5 @@
-import React, {createContext, ReactNode, useContext, useState} from 'react';
-import type {ResumeData} from "../../business/domain/models/curriculum.model.ts";
+import React, { createContext, ReactNode, useContext, useState } from 'react';
+import type { ResumeData } from "../../business/domain/models/curriculum.model.ts";
 
 interface ResumeContextType {
     resumeData: ResumeData | null;
@@ -8,11 +8,11 @@ interface ResumeContextType {
 
 const ResumeContext = createContext<ResumeContextType | undefined>(undefined);
 
-export const ResumeProvider: React.FC<{ children: ReactNode }> = ({children}) => {
+export const ResumeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [resumeData, setResumeData] = useState<ResumeData | null>(null);
 
     return (
-        <ResumeContext.Provider value={{resumeData, setResumeData}}>
+        <ResumeContext.Provider value={{ resumeData, setResumeData }}>
             {children}
         </ResumeContext.Provider>
     );
