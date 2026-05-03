@@ -10,12 +10,13 @@ import { selectUserId } from '../store/auth.slice';
 
 interface JobApplicationsContextType {
     jobApplications: JobApplication[];
+    refreshJobApplicationsFromBackend: () => Promise<void>;
     addJobApplication: (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => Promise<void>;
-    updateJobApplication: (id: string, data: Partial<JobApplication>) => void;
+    updateJobApplication: (id: string, data: Partial<JobApplication>) => Promise<void>;
     moveJobApplication: (id: string, newSectionId: string) => void;
     moveAllFromSection: (fromSectionId: string, toSectionId: string) => void;
-    removeJobApplication: (id: string) => void;
-    removeAllFromSection: (sectionId: string) => void;
+    removeJobApplication: (id: string) => Promise<void>;
+    removeAllFromSection: (sectionId: string) => Promise<void>;
     getBySection: (sectionId: string) => JobApplication[];
 }
 
@@ -28,19 +29,19 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ chi
     const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
     const userId = useSelector(selectUserId);
 
-    const refreshJobApplications = useCallback(async (targetUserId: string) => {
-        const { jobApplications: fetched } = await categoryService.findAllCategories(targetUserId);
+    const refreshJobApplicationsFromBackend = useCallback(async () => {
+        if (!userId) return;
+        const { jobApplications: fetched } = await categoryService.findAllCategories(userId);
         setJobApplications(fetched);
-    }, []);
+    }, [userId]);
 
     useEffect(() => {
         if (!userId) {
             setJobApplications([]);
             return;
         }
-
-        refreshJobApplications(userId).catch(() => setJobApplications([]));
-    }, [userId, refreshJobApplications]);
+        refreshJobApplicationsFromBackend().catch(() => setJobApplications([]));
+    }, [userId, refreshJobApplicationsFromBackend]);
 
     const addJobApplication = useCallback(
         async (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>): Promise<void> => {
@@ -52,77 +53,75 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ chi
                 observation: data.notes ?? '',
                 categoryId: sectionId,
             });
-
-            if (userId) {
-                await refreshJobApplications(userId);
-            }
+            await refreshJobApplicationsFromBackend();
         },
-        [userId, refreshJobApplications],
+        [refreshJobApplicationsFromBackend],
     );
 
     const updateJobApplication = useCallback(
-        (id: string, data: Partial<JobApplication>) => {
-            setJobApplications((prev) =>
-                prev.map((item) => (item.id === id ? { ...item, ...data } : item)),
-            );
-
+        async (id: string, data: Partial<JobApplication>): Promise<void> => {
             const current = jobApplications.find((j) => j.id === id);
-            if (current) {
-                const merged = { ...current, ...data };
-                jobService
-                    .updateJob({
-                        id,
-                        enterpriseName: merged.company,
-                        jobTitle: merged.position,
-                        candidatedAt: merged.appliedDate,
-                        jobLink: merged.link ?? '',
-                        observation: merged.notes ?? '',
-                    })
-                    .catch(() => {
-                        setJobApplications((prev) =>
-                            prev.map((item) => (item.id === id ? current : item)),
-                        );
-                    });
-            }
+            if (!current) return;
+            const merged = { ...current, ...data };
+            await jobService.updateJob({
+                id,
+                enterpriseName: merged.company,
+                jobTitle: merged.position,
+                candidatedAt: merged.appliedDate,
+                jobLink: merged.link ?? '',
+                observation: merged.notes ?? '',
+            });
+            await refreshJobApplicationsFromBackend();
         },
-        [jobApplications],
+        [jobApplications, refreshJobApplicationsFromBackend],
     );
 
-    const moveJobApplication = useCallback((id: string, newSectionId: string) => {
-        setJobApplications((prev) =>
-            prev.map((item) => (item.id === id ? { ...item, sectionId: newSectionId } : item)),
-        );
+    const moveJobApplication = useCallback(
+        (id: string, newSectionId: string) => {
+            setJobApplications((prev) =>
+                prev.map((item) => (item.id === id ? { ...item, sectionId: newSectionId } : item)),
+            );
+            jobService
+                .switchJobCategory({ id, categoryId: newSectionId })
+                .then(() => refreshJobApplicationsFromBackend())
+                .catch(() => refreshJobApplicationsFromBackend());
+        },
+        [refreshJobApplicationsFromBackend],
+    );
 
-        jobService
-            .switchJobCategory({ id, categoryId: newSectionId })
-            .catch(() => { /* optimistic — silently ignore */ });
-    }, []);
+    const moveAllFromSection = useCallback(
+        (fromSectionId: string, toSectionId: string) => {
+            setJobApplications((prev) =>
+                prev.map((item) =>
+                    item.sectionId === fromSectionId ? { ...item, sectionId: toSectionId } : item,
+                ),
+            );
+            const toMove = jobApplications.filter((j) => j.sectionId === fromSectionId);
+            Promise.all(
+                toMove.map((job) => jobService.switchJobCategory({ id: job.id, categoryId: toSectionId })),
+            )
+                .then(() => refreshJobApplicationsFromBackend())
+                .catch(() => refreshJobApplicationsFromBackend());
+        },
+        [jobApplications, refreshJobApplicationsFromBackend],
+    );
 
-    const moveAllFromSection = useCallback((fromSectionId: string, toSectionId: string) => {
-        setJobApplications((prev) =>
-            prev.map((item) =>
-                item.sectionId === fromSectionId ? { ...item, sectionId: toSectionId } : item,
-            ),
-        );
+    const removeJobApplication = useCallback(
+        async (id: string): Promise<void> => {
+            await jobService.deleteJob(id);
+            await refreshJobApplicationsFromBackend();
+        },
+        [refreshJobApplicationsFromBackend],
+    );
 
-        const toMove = jobApplications.filter((j) => j.sectionId === fromSectionId);
-        toMove.forEach((job) => {
-            jobService.switchJobCategory({ id: job.id, categoryId: toSectionId }).catch(() => { });
-        });
-    }, [jobApplications]);
-
-    const removeJobApplication = useCallback((id: string) => {
-        setJobApplications((prev) => prev.filter((item) => item.id !== id));
-        jobService.deleteJob(id).catch(() => { /* optimistic */ });
-    }, []);
-
-    const removeAllFromSection = useCallback((sectionId: string) => {
-        const toRemove = jobApplications.filter((j) => j.sectionId === sectionId);
-        setJobApplications((prev) => prev.filter((item) => item.sectionId !== sectionId));
-        toRemove.forEach((job) => {
-            jobService.deleteJob(job.id).catch(() => { });
-        });
-    }, [jobApplications]);
+    const removeAllFromSection = useCallback(
+        async (sectionId: string): Promise<void> => {
+            const toRemove = jobApplications.filter((j) => j.sectionId === sectionId);
+            await Promise.all(toRemove.map((job) => jobService.deleteJob(job.id)));
+            await refreshJobApplicationsFromBackend();
+        },
+        [jobApplications, refreshJobApplicationsFromBackend],
+    );
 
     const getBySection = useCallback(
         (sectionId: string) => jobApplications.filter((item) => item.sectionId === sectionId),
@@ -133,6 +132,7 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ chi
         <JobApplicationsContext.Provider
             value={{
                 jobApplications,
+                refreshJobApplicationsFromBackend,
                 addJobApplication,
                 updateJobApplication,
                 moveJobApplication,

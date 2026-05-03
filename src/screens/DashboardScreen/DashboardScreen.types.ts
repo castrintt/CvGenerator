@@ -1,5 +1,6 @@
 import type {CollisionDetection} from '@dnd-kit/core';
 import type {SensorDescriptor} from '@dnd-kit/core';
+import type {UseFormReturn, SubmitHandler} from 'react-hook-form';
 import type {JobApplication} from '../../../business/domain/models/jobApplication.model';
 import type {Section} from '../../../business/domain/models/section.model';
 
@@ -20,12 +21,16 @@ export type DeleteSectionConfirmState = {
     cardsCount: number;
 } | null;
 
-export type DashboardScreenJobApplicationCardProps = {
-    jobApplication: JobApplication;
-    colorKey: string;
-    onView: () => void;
-    onEdit: () => void;
-    onRemove: () => void;
+export type JobApplicationFormValues = {
+    company: string;
+    position: string;
+    appliedDate: string;
+    link: string;
+    notes: string;
+};
+
+export type SectionFormValues = {
+    name: string;
 };
 
 export type DashboardScreenBoardColumnProps = {
@@ -44,6 +49,7 @@ export type DashboardScreenController = {
     actions: {
         removeJobApplication: (id: string) => void;
         logout: () => Promise<void>;
+        navigateToProfile: () => void;
         openAddModal: (sectionId: string) => void;
         openEditModal: (item: JobApplication) => void;
         openViewModal: (item: JobApplication) => void;
@@ -55,8 +61,8 @@ export type DashboardScreenController = {
         handleDragStart: (event: import('@dnd-kit/core').DragStartEvent) => void;
         handleDragEnd: (event: import('@dnd-kit/core').DragEndEvent) => void;
         handleDragOver: (event: {over: {id: unknown} | null}) => void;
-        handleSaveEdit: () => void;
-        handleSaveSection: () => void;
+        onSubmitJobApplicationForm: SubmitHandler<JobApplicationFormValues>;
+        onSubmitSectionForm: SubmitHandler<SectionFormValues>;
         handleDeleteSection: (sectionId: string) => void;
         confirmDeleteSection: () => void;
         cancelDeleteSection: () => void;
@@ -65,6 +71,7 @@ export type DashboardScreenController = {
         sections: Section[];
         jobApplicationsBySection: Record<string, JobApplication[]>;
         userEmail: string;
+        userName: string;
         sensors: SensorDescriptor<any>[];
         collisionDetection: CollisionDetection;
         overId: string | null;
@@ -79,7 +86,8 @@ export type DashboardScreenController = {
         isViewJobModalOpen: boolean;
         viewModalJob: JobApplication | null;
         isSectionModalOpen: boolean;
-        newJobDefaultDateIso: string;
+        jobForm: UseFormReturn<JobApplicationFormValues>;
+        sectionForm: UseFormReturn<SectionFormValues>;
     };
 };
 

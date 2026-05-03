@@ -26,4 +26,8 @@ export class AuthenticationService implements IAuthenticationService {
   async logout(): Promise<void> {
     return this.gateway.logout();
   }
+
+  async fetchAuthenticatedUser(): Promise<AuthenticatedUserDto> {
+    return this.gateway.fetchAuthenticatedUser();
+  }
 }

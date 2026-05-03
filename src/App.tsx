@@ -6,6 +6,7 @@ import {FeedbackScreen} from "./screens/FeedbackScreen/FeedbackScreen.tsx";
 import {HomeScreen} from "./screens/HomeScreen/HomeScreen.tsx";
 import {LoginScreen} from "./screens/LoginScreen/LoginScreen.tsx";
 import {DashboardScreen} from "./screens/DashboardScreen/DashboardScreen.tsx";
+import {ProfileScreen} from "./screens/ProfileScreen/ProfileScreen.tsx";
 import {ThemeToggle} from "./components/ThemeToggle/ThemeToggle.tsx";
 import {ProtectedRoute} from "./components/ProtectedRoute/ProtectedRoute.tsx";
 import {useTheme} from "./context/ThemeContext.tsx";
@@ -26,6 +27,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <DashboardScreen/>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <ProfileScreen/>
                         </ProtectedRoute>
                     }
                 />

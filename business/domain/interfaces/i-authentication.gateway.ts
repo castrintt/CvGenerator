@@ -4,4 +4,5 @@ export interface IAuthenticationGateway {
   login(dto: LoginCredentialsDto): Promise<AuthenticatedUserDto>;
   register(dto: RegisterCredentialsDto): Promise<void>;
   logout(): Promise<void>;
+  fetchAuthenticatedUser(): Promise<AuthenticatedUserDto>;
 }

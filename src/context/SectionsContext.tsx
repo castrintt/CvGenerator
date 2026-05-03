@@ -9,117 +9,92 @@ import { selectUserId } from '../store/auth.slice';
 interface SectionsContextType {
     sections: Section[];
     isLoading: boolean;
-    addSection: (name: string) => Section;
-    updateSection: (id: string, data: Partial<Pick<Section, 'name' | 'colorKey'>>) => void;
-    removeSection: (id: string) => void;
-    reorderSections: (fromIndex: number, toIndex: number) => void;
+    addSection: (name: string) => Promise<void>;
+    updateSection: (id: string, data: Partial<Pick<Section, 'name' | 'colorKey'>>) => Promise<void>;
+    removeSection: (id: string) => Promise<void>;
+    reorderSections: (fromIndex: number, toIndex: number) => Promise<void>;
 }
 
 const SectionsContext = createContext<SectionsContextType | undefined>(undefined);
 
 const categoryService = container.get<ICategoryService>(CategorySymbols.CategoryService);
 
-const generateId = () => `section-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-
 export const SectionsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [sections, setSections] = useState<Section[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const userId = useSelector(selectUserId);
 
-    useEffect(() => {
+    const refreshSectionsFromBackend = useCallback(async () => {
         if (!userId) return;
-
         setIsLoading(true);
-        categoryService
-            .findAllCategories(userId)
-            .then(({ sections: fetchedSections }) => {
-                setSections(fetchedSections);
-            })
-            .catch(() => {
-                setSections([]);
-            })
-            .finally(() => setIsLoading(false));
+        try {
+            const { sections: fetchedSections } = await categoryService.findAllCategories(userId);
+            setSections(fetchedSections);
+        } finally {
+            setIsLoading(false);
+        }
     }, [userId]);
 
+    useEffect(() => {
+        if (!userId) {
+            setSections([]);
+            return;
+        }
+        refreshSectionsFromBackend();
+    }, [refreshSectionsFromBackend, userId]);
+
     const addSection = useCallback(
-        (name: string): Section => {
+        async (name: string): Promise<void> => {
+            if (!userId) return;
             const order = sections.length;
-            const newSection: Section = {
-                id: generateId(),
-                name,
-                order,
-                colorKey: 'custom',
-            };
-            setSections((prev) => [...prev, newSection]);
-
-            if (userId) {
-                categoryService
-                    .createCategory({ userId, name, order })
-                    .catch(() => {
-                        setSections((prev) => prev.filter((s) => s.id !== newSection.id));
-                    });
-            }
-
-            return newSection;
+            await categoryService.createCategory({ userId, name, order });
+            await refreshSectionsFromBackend();
         },
-        [sections.length, userId],
+        [sections.length, userId, refreshSectionsFromBackend],
     );
 
     const updateSection = useCallback(
-        (id: string, data: Partial<Pick<Section, 'name' | 'colorKey'>>) => {
-            setSections((prev) =>
-                prev.map((s) => (s.id === id ? { ...s, ...data } : s)),
-            );
-
-            const updated = sections.find((s) => s.id === id);
-            if (updated && userId) {
-                categoryService
-                    .updateCategory({
-                        id,
-                        name: data.name ?? updated.name,
-                        order: updated.order,
-                    })
-                    .catch(() => {
-                        setSections((prev) =>
-                            prev.map((s) => (s.id === id ? updated : s)),
-                        );
-                    });
-            }
+        async (id: string, data: Partial<Pick<Section, 'name' | 'colorKey'>>): Promise<void> => {
+            const current = sections.find((s) => s.id === id);
+            if (!current) return;
+            await categoryService.updateCategory({
+                id,
+                name: data.name ?? current.name,
+                order: current.order,
+            });
+            await refreshSectionsFromBackend();
         },
-        [sections, userId],
+        [sections, refreshSectionsFromBackend],
     );
 
     const removeSection = useCallback(
-        (id: string) => {
-            setSections((prev) => prev.filter((s) => s.id !== id));
-
-            categoryService.deleteCategory(id).catch(() => {
-                /* optimistic — errors handled silently */
-            });
+        async (id: string): Promise<void> => {
+            await categoryService.deleteCategory(id);
+            await refreshSectionsFromBackend();
         },
-        [],
+        [refreshSectionsFromBackend],
     );
 
     const reorderSections = useCallback(
-        (fromIndex: number, toIndex: number) => {
-            setSections((prev) => {
-                const reordered = [...prev];
-                const [moved] = reordered.splice(fromIndex, 1);
-                reordered.splice(toIndex, 0, moved);
-                const withNewOrder = reordered.map((s, idx) => ({ ...s, order: idx }));
+        async (fromIndex: number, toIndex: number): Promise<void> => {
+            const reordered = [...sections];
+            const [moved] = reordered.splice(fromIndex, 1);
+            reordered.splice(toIndex, 0, moved);
+            const withNewOrder = reordered.map((s, idx) => ({ ...s, order: idx }));
 
-                if (userId) {
-                    withNewOrder.forEach((s) => {
-                        categoryService
-                            .updateCategory({ id: s.id, name: s.name, order: s.order })
-                            .catch(() => { /* silently ignore — UI already reflects change */ });
-                    });
-                }
+            setSections(withNewOrder);
 
-                return withNewOrder;
-            });
+            try {
+                await Promise.all(
+                    withNewOrder.map((s) =>
+                        categoryService.updateCategory({ id: s.id, name: s.name, order: s.order }),
+                    ),
+                );
+            } finally {
+                await refreshSectionsFromBackend();
+            }
         },
-        [userId],
+        [sections, refreshSectionsFromBackend],
     );
 
     return (

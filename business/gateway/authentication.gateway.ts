@@ -22,4 +22,9 @@ export class AuthenticationGateway implements IAuthenticationGateway {
   async logout(): Promise<void> {
     await httpPublic.post(ApiRoutes.auth.logout);
   }
+
+  async fetchAuthenticatedUser(): Promise<AuthenticatedUserDto> {
+    const { data } = await httpPublic.post<AuthenticatedUserDto>(ApiRoutes.auth.refresh);
+    return data;
+  }
 }

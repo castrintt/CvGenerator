@@ -1,17 +1,23 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {useSortable} from '@dnd-kit/sortable';
 import {CSS} from '@dnd-kit/utilities';
 import {
-    AddButton,
+    AddJobButton,
     CardsList,
     Column,
-    SectionDeleteBtn,
-    SectionDragHandle,
-    SectionEditActions,
+    ColumnCountBadge,
+    ColumnDragHandle,
+    ColumnEmptyIcon,
+    ColumnEmptyState,
+    ColumnHeaderLeft,
+    ColumnMenuButton,
+    ColumnMenuDropdown,
+    ColumnMenuDropdownItem,
+    ColumnMenuWrapper,
     SectionEditHeader,
     SortableSection,
 } from './DashboardScreen.styles';
-import {DashboardScreenJobApplicationCard} from './DashboardScreen.job-application-card';
+import {JobApplicationCard} from '../../components/JobApplicationCard/job-application-card';
 import type {DashboardScreenBoardColumnProps} from './DashboardScreen.types';
 
 export const DashboardScreenBoardColumn: React.FC<DashboardScreenBoardColumnProps> = ({
@@ -25,6 +31,9 @@ export const DashboardScreenBoardColumn: React.FC<DashboardScreenBoardColumnProp
     onDeleteSection,
     overId,
 }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
     const {
         attributes,
         listeners,
@@ -47,40 +56,93 @@ export const DashboardScreenBoardColumn: React.FC<DashboardScreenBoardColumnProp
     const isOver =
         overId === section.id || jobApplications.some((item) => item.id === overId);
 
+    const closeMenu = useCallback(() => setIsMenuOpen(false), []);
+
+    useEffect(() => {
+        if (!isMenuOpen) return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                closeMenu();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [isMenuOpen, closeMenu]);
+
+    const handleEditSection = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        closeMenu();
+        onEditSection();
+    };
+
+    const handleDeleteSection = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        closeMenu();
+        onDeleteSection();
+    };
+
     return (
         <SortableSection ref={setNodeRef} style={style} $isDragging={isDragging}>
             <Column $isOver={isOver} $colorKey={section.colorKey}>
                 <SectionEditHeader>
-                    <SectionDragHandle {...listeners} {...attributes}>
+                    <ColumnHeaderLeft {...listeners} {...attributes}>
+                        <ColumnDragHandle>⠿</ColumnDragHandle>
                         <h3>{section.name}</h3>
-                    </SectionDragHandle>
-                    <AddButton type="button" onClick={onAdd} title="Adicionar candidatura">
-                        +
-                    </AddButton>
-                    <SectionEditActions
+                        <ColumnCountBadge>{jobApplications.length}</ColumnCountBadge>
+                    </ColumnHeaderLeft>
+
+                    <ColumnMenuWrapper
+                        ref={menuRef}
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <button type="button" onClick={onEditSection} title="Editar nome da seção">
-                            ✎
-                        </button>
-                        <SectionDeleteBtn type="button" onClick={onDeleteSection} title="Excluir seção">
-                            ✕
-                        </SectionDeleteBtn>
-                    </SectionEditActions>
+                        <ColumnMenuButton
+                            type="button"
+                            onClick={() => setIsMenuOpen((prev) => !prev)}
+                            title="Opções da categoria"
+                        >
+                            ⋮
+                        </ColumnMenuButton>
+                        <ColumnMenuDropdown $open={isMenuOpen}>
+                            <ColumnMenuDropdownItem type="button" onClick={handleEditSection}>
+                                Editar nome
+                            </ColumnMenuDropdownItem>
+                            <ColumnMenuDropdownItem type="button" $danger onClick={handleDeleteSection}>
+                                Excluir categoria
+                            </ColumnMenuDropdownItem>
+                        </ColumnMenuDropdown>
+                    </ColumnMenuWrapper>
                 </SectionEditHeader>
+
                 <CardsList>
-                    {jobApplications.map((item) => (
-                        <DashboardScreenJobApplicationCard
-                            key={item.id}
-                            jobApplication={item}
-                            colorKey={section.colorKey}
-                            onView={() => onView(item)}
-                            onEdit={() => onEdit(item)}
-                            onRemove={() => onRemove(item.id)}
-                        />
-                    ))}
+                    {jobApplications.length === 0 ? (
+                        <ColumnEmptyState>
+                            <ColumnEmptyIcon>📥</ColumnEmptyIcon>
+                            Nenhuma vaga nesta categoria ainda.
+                        </ColumnEmptyState>
+                    ) : (
+                        jobApplications.map((item) => (
+                            <JobApplicationCard
+                                key={item.id}
+                                jobApplication={item}
+                                colorKey={section.colorKey}
+                                onView={() => onView(item)}
+                                onEdit={() => onEdit(item)}
+                                onRemove={() => onRemove(item.id)}
+                            />
+                        ))
+                    )}
                 </CardsList>
+
+                <AddJobButton
+                    type="button"
+                    onClick={onAdd}
+                    onPointerDown={(e) => e.stopPropagation()}
+                >
+                    + Adicionar vaga
+                </AddJobButton>
             </Column>
         </SortableSection>
     );

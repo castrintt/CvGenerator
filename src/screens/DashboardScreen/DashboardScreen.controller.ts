@@ -1,5 +1,7 @@
-import {useReducer} from 'react';
+import {useEffect, useReducer} from 'react';
 import {useNavigate} from 'react-router-dom';
+import {useForm} from 'react-hook-form';
+import type {SubmitHandler} from 'react-hook-form';
 import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
 import {PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {useAuth} from '../../context/AuthContext';
@@ -7,9 +9,11 @@ import {useJobApplications} from '../../context/JobApplicationsContext';
 import {useSections} from '../../context/SectionsContext';
 import type {JobApplication} from '../../../business/domain/models/jobApplication.model';
 import type {Section} from '../../../business/domain/models/section.model';
+import type {JobApplicationFormValues, SectionFormValues} from './DashboardScreen.types';
 import {
     brToIso,
     collisionDetectionStrategy,
+    formatDateBR,
     resolveDropSectionId,
 } from './DashboardScreen.utils';
 import {
@@ -25,7 +29,7 @@ export const UseDashboardScreenController = () => {
         updateJobApplication,
         removeJobApplication,
         moveJobApplication,
-        removeAllFromSection,
+        refreshJobApplicationsFromBackend,
         getBySection,
     } = useJobApplications();
     const {sections, addSection, updateSection, removeSection, reorderSections} = useSections();
@@ -40,9 +44,44 @@ export const UseDashboardScreenController = () => {
     );
     const {editModal, viewModalJob, sectionModal, overId, activeId, deleteSectionConfirm} = ui;
 
+    const jobForm = useForm<JobApplicationFormValues>({
+        defaultValues: {company: '', position: '', appliedDate: '', link: '', notes: ''},
+    });
+
+    const sectionForm = useForm<SectionFormValues>({
+        defaultValues: {name: ''},
+    });
+
+    useEffect(() => {
+        if (editModal.sectionId === null) {
+            jobForm.reset({company: '', position: '', appliedDate: '', link: '', notes: ''});
+            return;
+        }
+        const job = editModal.jobApplication;
+        jobForm.reset({
+            company: job?.company ?? '',
+            position: job?.position ?? '',
+            appliedDate: job ? formatDateBR(job.appliedDate) : formatDateBR(new Date().toISOString().slice(0, 10)),
+            link: job?.link ?? '',
+            notes: job?.notes ?? '',
+        });
+    }, [editModal]);
+
+    useEffect(() => {
+        if (!sectionModal.section && !sectionModal.isNew) {
+            sectionForm.reset({name: ''});
+            return;
+        }
+        sectionForm.reset({name: sectionModal.section?.name ?? ''});
+    }, [sectionModal]);
+
     const logout = async () => {
         await authLogout();
         navigate('/');
+    };
+
+    const navigateToProfile = () => {
+        navigate('/profile');
     };
 
     const orderedSections = [...sections].sort((a, b) => a.order - b.order);
@@ -140,54 +179,47 @@ export const UseDashboardScreenController = () => {
         });
     };
 
-    const handleSaveEdit = () => {
+    const onSubmitJobApplicationForm: SubmitHandler<JobApplicationFormValues> = async (values) => {
         if (!editModal.sectionId) return;
-        const form = document.getElementById('edit-job-form') as HTMLFormElement;
-        if (!form) return;
-        const formData = new FormData(form);
-        const brDate = String(formData.get('appliedDate') ?? '').trim();
-        const isoDate = brToIso(brDate);
+
         const todayIso = new Date().toISOString().slice(0, 10);
+        const isoDate = brToIso(values.appliedDate);
 
         if (editModal.isNew && !editModal.jobApplication) {
-            const appliedDate = isoDate || todayIso;
-            addJobApplication(editModal.sectionId, {
-                company: String(formData.get('company') ?? ''),
-                position: String(formData.get('position') ?? ''),
-                appliedDate,
-                link: String(formData.get('link') || '') || undefined,
-                notes: String(formData.get('notes') || '') || undefined,
+            await addJobApplication(editModal.sectionId, {
+                company: values.company,
+                position: values.position,
+                appliedDate: isoDate || todayIso,
+                link: values.link || undefined,
+                notes: values.notes || undefined,
             });
             closeModal();
             return;
         }
 
         if (!editModal.jobApplication) return;
-        const appliedDate = isoDate || editModal.jobApplication.appliedDate;
-        updateJobApplication(editModal.jobApplication.id, {
-            company: String(formData.get('company') ?? ''),
-            position: String(formData.get('position') ?? ''),
-            appliedDate,
-            link: String(formData.get('link') || '') || undefined,
-            notes: String(formData.get('notes') || '') || undefined,
+
+        await updateJobApplication(editModal.jobApplication.id, {
+            company: values.company,
+            position: values.position,
+            appliedDate: isoDate || editModal.jobApplication.appliedDate,
+            link: values.link || undefined,
+            notes: values.notes || undefined,
         });
         closeModal();
     };
 
-    const handleSaveSection = () => {
-        const form = document.getElementById('edit-section-form') as HTMLFormElement;
-        if (!form) return;
-        const formData = new FormData(form);
-        const name = String(formData.get('name') ?? '').trim() || 'Nova seção';
+    const onSubmitSectionForm: SubmitHandler<SectionFormValues> = (values) => {
+        const sectionName = values.name.trim() || 'Nova seção';
 
         if (sectionModal.isNew && !sectionModal.section) {
-            addSection(name);
+            addSection(sectionName);
             closeSectionModal();
             return;
         }
 
         if (!sectionModal.section) return;
-        updateSection(sectionModal.section.id, {name});
+        updateSection(sectionModal.section.id, {name: sectionName});
         closeSectionModal();
     };
 
@@ -205,12 +237,12 @@ export const UseDashboardScreenController = () => {
         });
     };
 
-    const confirmDeleteSection = () => {
+    const confirmDeleteSection = async () => {
         if (!deleteSectionConfirm) return;
         const {sectionId} = deleteSectionConfirm;
-        removeAllFromSection(sectionId);
-        removeSection(sectionId);
         dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
+        await removeSection(sectionId);
+        await refreshJobApplicationsFromBackend();
     };
 
     const cancelDeleteSection = () => {
@@ -221,12 +253,12 @@ export const UseDashboardScreenController = () => {
     const isViewJobModalOpen = viewModalJob !== null;
     const isJobEditModalOpen =
         editModal.sectionId !== null && (editModal.jobApplication !== null || editModal.isNew);
-    const newJobDefaultDateIso = new Date().toISOString().slice(0, 10);
 
     return {
         actions: {
             removeJobApplication,
             logout,
+            navigateToProfile,
             openAddModal,
             openEditModal,
             openViewModal,
@@ -238,8 +270,8 @@ export const UseDashboardScreenController = () => {
             handleDragStart,
             handleDragEnd,
             handleDragOver,
-            handleSaveEdit,
-            handleSaveSection,
+            onSubmitJobApplicationForm,
+            onSubmitSectionForm,
             handleDeleteSection,
             confirmDeleteSection,
             cancelDeleteSection,
@@ -248,6 +280,7 @@ export const UseDashboardScreenController = () => {
             sections: orderedSections,
             jobApplicationsBySection,
             userEmail: user?.email ?? '',
+            userName: user?.name ?? '',
             sensors,
             collisionDetection: collisionDetectionStrategy,
             overId,
@@ -262,7 +295,8 @@ export const UseDashboardScreenController = () => {
             isViewJobModalOpen,
             viewModalJob,
             isSectionModalOpen,
-            newJobDefaultDateIso,
+            jobForm,
+            sectionForm,
         },
     };
 };

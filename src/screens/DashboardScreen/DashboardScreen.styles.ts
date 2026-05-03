@@ -9,13 +9,13 @@ export const Container = styled.div`
     flex-direction: column;
     background-color: var(--background-color);
     color: var(--text-primary);
-    padding: 20px 24px 24px;
-    padding-right: 100px;
+    padding: 24px 28px 24px;
+    padding-right: 104px;
     box-sizing: border-box;
     overflow: hidden;
 
     @media (max-width: 768px) {
-        padding-right: 80px;
+        padding-right: 84px;
     }
 
     @media (max-width: 480px) {
@@ -28,13 +28,12 @@ export const Header = styled.header`
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
+    align-items: flex-start;
+    margin-bottom: 28px;
     padding-bottom: 24px;
     border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
     gap: 16px;
-    min-height: 44px;
 
     @media (max-width: 768px) {
         flex-direction: column;
@@ -45,9 +44,16 @@ export const Header = styled.header`
         margin-bottom: 20px;
         padding-bottom: 16px;
     }
+`;
+
+export const HeaderLeft = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     h1 {
-        font-size: 24px;
+        font-size: 22px;
+        font-weight: 700;
         margin: 0;
         color: var(--text-primary);
 
@@ -55,7 +61,7 @@ export const Header = styled.header`
             content: '';
             display: inline-block;
             width: 4px;
-            height: 24px;
+            height: 22px;
             background-color: var(--accent-color);
             margin-right: 12px;
             vertical-align: middle;
@@ -63,12 +69,34 @@ export const Header = styled.header`
         }
 
         @media (max-width: 480px) {
-            font-size: 20px;
+            font-size: 18px;
 
             &:before {
-                height: 20px;
+                height: 18px;
             }
         }
+    }
+`;
+
+export const PageSubtitle = styled.p`
+    margin: 0 0 0 16px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+
+    @media (max-width: 480px) {
+        font-size: 12px;
+    }
+`;
+
+export const HeaderRight = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+
+    button {
+        min-height: 40px;
     }
 `;
 
@@ -96,30 +124,6 @@ export const UserInfo = styled.div`
     }
 `;
 
-/** Bloco único de ajuda (seções) no dashboard */
-export const HelpSection = styled.div`
-    flex-shrink: 0;
-    background: rgba(45, 156, 219, 0.08);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    color: var(--text-secondary);
-    font-size: 13px;
-    line-height: 1.55;
-
-    strong {
-        color: var(--text-primary);
-        font-weight: 600;
-    }
-
-    @media (max-width: 480px) {
-        padding: 12px 14px;
-        font-size: 12px;
-    }
-`;
-
-/** Envolve o board e o overlay para o board ocupar a altura restante da viewport */
 export const BoardShell = styled.div`
     flex: 1;
     min-height: 0;
@@ -133,7 +137,7 @@ export const Board = styled.div`
     min-height: 0;
     display: flex;
     align-items: stretch;
-    gap: 24px;
+    gap: 20px;
     overflow-x: auto;
     overflow-y: hidden;
     padding-bottom: 8px;
@@ -152,7 +156,7 @@ export const Board = styled.div`
     }
 
     @media (max-width: 480px) {
-        gap: 16px;
+        gap: 14px;
     }
 `;
 
@@ -180,14 +184,14 @@ export const Column = styled.div<{ $isOver?: boolean; $colorKey?: string }>`
     display: flex;
     flex-direction: column;
     background: ${(p) => (p.$colorKey ? sectionBgVar[p.$colorKey] ?? 'var(--card-bg)' : 'var(--card-bg)')};
-    border: 2px dashed ${(p) => {
+    border: 1px solid ${(p) => {
         if (p.$isOver) return 'var(--accent-color)';
         return p.$colorKey ? (sectionBorderVar[p.$colorKey] ?? 'var(--border-color)') : 'var(--border-color)';
     }};
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 16px;
-    transition: border-color 0.2s, background 0.2s;
-    ${(p) => p.$isOver && 'background: rgba(45, 156, 219, 0.15) !important;'}
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    ${(p) => p.$isOver && 'box-shadow: 0 0 0 2px var(--accent-color); background: rgba(45, 156, 219, 0.08) !important;'}
 
     @media (max-width: 480px) {
         padding: 12px;
@@ -198,7 +202,8 @@ export const ColumnHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
+    gap: 8px;
 
     h3 {
         font-size: 14px;
@@ -208,15 +213,116 @@ export const ColumnHeader = styled.div`
     }
 `;
 
+export const ColumnHeaderLeft = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    cursor: grab;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    h3 {
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+`;
+
+export const ColumnCountBadge = styled.span`
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--secondary-color);
+    color: var(--text-secondary);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    flex-shrink: 0;
+`;
+
+export const ColumnMenuWrapper = styled.div`
+    position: relative;
+    flex-shrink: 0;
+`;
+
+export const ColumnMenuButton = styled.button`
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 28px;
+    transition: background 0.15s, color 0.15s;
+
+    &:hover {
+        background: var(--secondary-color);
+        color: var(--text-primary);
+    }
+`;
+
+export const ColumnMenuDropdown = styled.div<{ $open: boolean }>`
+    display: ${(p) => (p.$open ? 'flex' : 'none')};
+    flex-direction: column;
+    position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+    min-width: 140px;
+    overflow: hidden;
+`;
+
+export const ColumnMenuDropdownItem = styled.button<{ $danger?: boolean }>`
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: ${(p) => (p.$danger ? '#EB5757' : 'var(--text-primary)')};
+    cursor: pointer;
+    transition: background 0.12s;
+
+    &:hover {
+        background: ${(p) => (p.$danger ? 'rgba(235, 87, 87, 0.08)' : 'var(--secondary-color)')};
+    }
+`;
+
+export const ColumnDragHandle = styled.span`
+    color: var(--text-secondary);
+    font-size: 14px;
+    flex-shrink: 0;
+    opacity: 0.5;
+    user-select: none;
+`;
+
 export const AddButton = styled.button`
     background: var(--accent-color);
     color: white;
     border: none;
     border-radius: 6px;
-    width: 36px;
-    height: 36px;
-    min-width: 36px;
-    min-height: 36px;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     font-size: 18px;
     cursor: pointer;
     display: flex;
@@ -236,12 +342,53 @@ export const AddButton = styled.button`
     }
 `;
 
+export const AddJobButton = styled.button`
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 10px 4px;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    border-radius: 6px;
+    transition: color 0.15s, background 0.15s;
+    flex-shrink: 0;
+    margin-top: 8px;
+
+    &:hover {
+        color: var(--accent-color);
+        background: rgba(45, 156, 219, 0.06);
+    }
+`;
+
+export const ColumnEmptyState = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 16px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    text-align: center;
+    gap: 8px;
+    opacity: 0.7;
+`;
+
+export const ColumnEmptyIcon = styled.span`
+    font-size: 22px;
+    display: block;
+`;
+
 export const CardsList = styled.div`
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
     overflow-x: hidden;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -249,10 +396,10 @@ export const CardsList = styled.div`
     margin-right: -4px;
 
     &::-webkit-scrollbar {
-        width: 8px;
+        width: 6px;
     }
     &::-webkit-scrollbar-track {
-        background: var(--secondary-color);
+        background: transparent;
         border-radius: 4px;
     }
     &::-webkit-scrollbar-thumb {
@@ -264,7 +411,7 @@ export const CardsList = styled.div`
 export const DragOverlayCard = styled.div`
     background: var(--input-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 12px;
     cursor: grabbing;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
@@ -284,72 +431,9 @@ export const DragOverlayCard = styled.div`
     }
 `;
 
-export const Card = styled.div<{ $isDragging?: boolean; $colorKey?: string }>`
-    background: ${(p) => (p.$colorKey ? sectionBgVar[p.$colorKey] ?? 'var(--input-bg)' : 'var(--input-bg)')};
-    border: 1px solid ${(p) => (p.$colorKey ? sectionBorderVar[p.$colorKey] ?? 'var(--border-color)' : 'var(--border-color)')};
-    border-radius: 8px;
-    padding: 12px;
-    cursor: grab;
-    transition: box-shadow 0.2s;
-    opacity: ${(p) => (p.$isDragging ? 0.5 : 1)};
-
-    &:active {
-        cursor: grabbing;
-    }
-
-    &:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    }
-
-    h4 {
-        font-size: 14px;
-        margin: 0 0 4px 0;
-        color: var(--text-primary);
-
-        @media (max-width: 480px) {
-            font-size: 13px;
-        }
-    }
-
-    p {
-        font-size: 12px;
-        color: var(--text-secondary);
-        margin: 0;
-
-        @media (max-width: 480px) {
-            font-size: 11px;
-        }
-    }
-`;
-
-export const CardActions = styled.div`
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-
-    button {
-        background: none;
-        border: none;
-        color: var(--text-secondary);
-        cursor: pointer;
-        font-size: 12px;
-        padding: 8px;
-        min-height: 36px;
-
-        &:hover {
-            color: var(--accent-color);
-        }
-
-        @media (max-width: 480px) {
-            padding: 10px;
-            min-height: 44px;
-        }
-    }
-`;
-
 export const HeaderActions = styled.div`
     display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
 `;
 
@@ -368,7 +452,6 @@ export const SortableSection = styled.div<{ $isDragging?: boolean }>`
     }
 `;
 
-/** Área pelo qual se arrasta a coluna para reordenar (não inclui cards de vaga) */
 export const SectionDragHandle = styled.div`
     display: flex;
     align-items: center;
@@ -399,15 +482,8 @@ export const SectionEditHeader = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
-    gap: 8px;
-
-    h3 {
-        font-size: 14px;
-        font-weight: 600;
-        margin: 0;
-        flex: 1;
-    }
+    margin-bottom: 14px;
+    gap: 6px;
 `;
 
 export const SectionEditActions = styled.div`
@@ -436,15 +512,6 @@ export const SectionDeleteBtn = styled.button`
     &:hover {
         color: #EB5757 !important;
         background: rgba(235, 87, 87, 0.1) !important;
-    }
-`;
-
-export const RemoveCardBtn = styled.button`
-    color: #EB5757 !important;
-
-    &:hover {
-        color: #EB5757 !important;
-        opacity: 0.8;
     }
 `;
 
@@ -565,6 +632,7 @@ export const FormRow = styled.div`
         background: var(--input-bg);
         color: var(--text-primary);
         min-height: 44px;
+        box-sizing: border-box;
 
         &:focus {
             outline: none;

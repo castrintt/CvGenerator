@@ -4,4 +4,5 @@ export interface IAuthenticationService {
   loginWithCredentials(dto: LoginCredentialsDto): Promise<AuthenticatedUserDto>;
   registerWithCredentials(dto: RegisterCredentialsDto): Promise<void>;
   logout(): Promise<void>;
+  fetchAuthenticatedUser(): Promise<AuthenticatedUserDto>;
 }

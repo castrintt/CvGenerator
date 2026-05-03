@@ -139,6 +139,7 @@ export type FormScreenComponentProps = {
             scrollToSection: (id: string) => void;
             goBack: () => void;
             register: any;
+            control: any;
             handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
             appendExperience: (value: any) => void;
             removeExperience: (index: number) => void;
@@ -151,8 +152,6 @@ export type FormScreenComponentProps = {
             setTemplate: (id: number) => void;
             watch: any;
             setValue: any;
-            handlePhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-            handleDateChange: (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => void;
             openActionModal: (templateId: number) => void;
             closeActionModal: () => void;
             selectTemplateFromModal: () => void;

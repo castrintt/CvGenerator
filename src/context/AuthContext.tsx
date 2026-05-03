@@ -17,11 +17,10 @@ interface AuthContextType {
     loginWithEmail: (email: string, password: string) => Promise<void>;
     registerWithEmail: (name: string, email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    updateUser: (data: Pick<User, 'name' | 'email'>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const STORAGE_KEY = 'cvgenerator_auth_user';
 
 const authService = container.get<IAuthenticationService>(
     AuthenticationSymbols.AuthenticationService,
@@ -33,26 +32,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const dispatch = useDispatch();
 
     useEffect(() => {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored) {
-            try {
-                const parsed = JSON.parse(stored) as User;
-                setLocalUser(parsed);
-                dispatch(setUser({ id: parsed.id, name: parsed.name ?? '', email: parsed.email }));
-            } catch {
-                localStorage.removeItem(STORAGE_KEY);
-            }
-        }
-        setIsLoading(false);
-    }, [dispatch]);
+        authService
+            .fetchAuthenticatedUser()
+            .then((dto) => {
+                syncUserState({ id: dto.id, email: dto.email, name: dto.name });
+            })
+            .catch(() => {
+                setLocalUser(null);
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
+    }, []);
 
-    const persistUser = (u: User | null) => {
-        setLocalUser(u);
-        if (u) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
-            dispatch(setUser({ id: u.id, name: u.name ?? '', email: u.email }));
+    const syncUserState = (authenticatedUser: User | null) => {
+        setLocalUser(authenticatedUser);
+        if (authenticatedUser) {
+            dispatch(setUser({ id: authenticatedUser.id, name: authenticatedUser.name ?? '', email: authenticatedUser.email }));
         } else {
-            localStorage.removeItem(STORAGE_KEY);
             dispatch(clearUser());
         }
     };
@@ -61,7 +58,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setIsLoading(true);
         try {
             const dto = await authService.loginWithCredentials({ email, password });
-            persistUser({ id: dto.id, email: dto.email, name: dto.name });
+            syncUserState({ id: dto.id, email: dto.email, name: dto.name });
         } finally {
             setIsLoading(false);
         }
@@ -72,7 +69,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             await authService.registerWithCredentials({ name, email, password });
             const dto = await authService.loginWithCredentials({ email, password });
-            persistUser({ id: dto.id, email: dto.email, name: dto.name });
+            syncUserState({ id: dto.id, email: dto.email, name: dto.name });
         } finally {
             setIsLoading(false);
         }
@@ -82,8 +79,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         try {
             await authService.logout();
         } finally {
-            persistUser(null);
+            syncUserState(null);
         }
+    };
+
+    const updateUser = (data: Pick<User, 'name' | 'email'>) => {
+        if (!user) return;
+        syncUserState({ ...user, ...data });
     };
 
     return (
@@ -94,6 +96,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 loginWithEmail,
                 registerWithEmail,
                 logout,
+                updateUser,
             }}
         >
             {children}

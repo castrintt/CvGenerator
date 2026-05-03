@@ -1,4 +1,5 @@
 import React from 'react';
+import {Controller} from 'react-hook-form';
 import {ActionModal, CloseButton, Container, Divider, ExperienceCard, Header, MainContent, ModalContent, ModalOverlay, PreviewContainer, PrivacyNotice, RemoveButton, Row, Section, Sidebar, SidebarContent, SidebarFooter, Step, StepIndicator, SubmitButtonContainer, TemplateCard, TemplateGrid, TemplateMiniature, TextArea, Title} from './FormScreen.styles';
 import {Input} from '../../components/Input/Input';
 import {Button} from '../../components/Button/Button';
@@ -7,6 +8,7 @@ import {
     FORM_SCREEN_TEMPLATE_NAMES,
     type FormScreenComponentProps,
 } from './FormScreen.types';
+import {maskPhone, maskMonthYear} from './FormScreen.utils';
 import {ClassicTemplate} from '../../components/ResumeTemplates/ClassicTemplate';
 import {ModernSidebarTemplate} from '../../components/ResumeTemplates/ModernSidebarTemplate';
 import {MinimalistTemplate} from '../../components/ResumeTemplates/MinimalistTemplate';
@@ -98,12 +100,18 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                    error={controller.states.errors.personalInfo?.email?.message}/>
                         </Row>
                         <Row>
-                            <Input
-                                label="Telefone"
-                                placeholder="(99) 9 9999-9999"
-                                {...controller.actions.register('personalInfo.phone')}
-                                onChange={controller.actions.handlePhoneChange}
-                                error={controller.states.errors.personalInfo?.phone?.message}
+                            <Controller
+                                name="personalInfo.phone"
+                                control={controller.actions.control}
+                                render={({field}) => (
+                                    <Input
+                                        {...field}
+                                        label="Telefone"
+                                        placeholder="(99) 9 9999-9999"
+                                        onChange={(e) => field.onChange(maskPhone(e.target.value))}
+                                        error={controller.states.errors.personalInfo?.phone?.message}
+                                    />
+                                )}
                             />
                             <Input label="Endereço"
                                    placeholder="Ex: Rio de Janeiro, RJ" {...controller.actions.register('personalInfo.address')}
@@ -151,19 +159,35 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                                error={controller.states.errors.experience?.[index]?.position?.message}/>
                                     </Row>
                                     <Row>
-                                        <Input label="Data de Início (MM/AAAA)"
-                                               placeholder="MM/AAAA"
-                                               {...controller.actions.register(`experience.${index}.startDate`)}
-                                               onChange={(e) => controller.actions.handleDateChange(e, `experience.${index}.startDate`)}
-                                               error={controller.states.errors.experience?.[index]?.startDate?.message}/>
+                                        <Controller
+                                            name={`experience.${index}.startDate`}
+                                            control={controller.actions.control}
+                                            render={({field}) => (
+                                                <Input
+                                                    {...field}
+                                                    label="Data de Início (MM/AAAA)"
+                                                    placeholder="MM/AAAA"
+                                                    onChange={(e) => field.onChange(maskMonthYear(e.target.value))}
+                                                    error={controller.states.errors.experience?.[index]?.startDate?.message}
+                                                />
+                                            )}
+                                        />
 
                                         <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
                                             {!isCurrent && (
-                                                <Input label="Data de Término (MM/AAAA)"
-                                                       placeholder="MM/AAAA"
-                                                       {...controller.actions.register(`experience.${index}.endDate`)}
-                                                       onChange={(e) => controller.actions.handleDateChange(e, `experience.${index}.endDate`)}
-                                                       error={controller.states.errors.experience?.[index]?.endDate?.message}/>
+                                                <Controller
+                                                    name={`experience.${index}.endDate`}
+                                                    control={controller.actions.control}
+                                                    render={({field}) => (
+                                                        <Input
+                                                            {...field}
+                                                            label="Data de Término (MM/AAAA)"
+                                                            placeholder="MM/AAAA"
+                                                            onChange={(e) => field.onChange(maskMonthYear(e.target.value))}
+                                                            error={controller.states.errors.experience?.[index]?.endDate?.message}
+                                                        />
+                                                    )}
+                                                />
                                             )}
                                             <div
                                                 style={{display: 'flex', alignItems: 'center', marginTop: isCurrent ? '30px' : '0'}}>
@@ -223,11 +247,19 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                                error={controller.states.errors.education?.[index]?.fieldOfStudy?.message}/>
 
                                         <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                                            <Input label={isStudying ? "Previsão de Conclusão (Opcional) (MM/AAAA)" : "Data de Graduação (MM/AAAA)"}
-                                                   placeholder="MM/AAAA"
-                                                   {...controller.actions.register(`education.${index}.graduationDate`)}
-                                                   onChange={(e) => controller.actions.handleDateChange(e, `education.${index}.graduationDate`)}
-                                                   error={controller.states.errors.education?.[index]?.graduationDate?.message}/>
+                                            <Controller
+                                                name={`education.${index}.graduationDate`}
+                                                control={controller.actions.control}
+                                                render={({field}) => (
+                                                    <Input
+                                                        {...field}
+                                                        label={isStudying ? 'Previsão de Conclusão (Opcional) (MM/AAAA)' : 'Data de Graduação (MM/AAAA)'}
+                                                        placeholder="MM/AAAA"
+                                                        onChange={(e) => field.onChange(maskMonthYear(e.target.value))}
+                                                        error={controller.states.errors.education?.[index]?.graduationDate?.message}
+                                                    />
+                                                )}
+                                            />
                                             
                                             <div
                                                 style={{display: 'flex', alignItems: 'center', marginTop: '10px'}}>
@@ -271,11 +303,19 @@ export const FormScreenComponent: React.FC<FormScreenComponentProps> = ({control
                                            error={controller.states.errors.schooling?.[index]?.degree?.message}/>
                                 </Row>
                                 <Row>
-                                    <Input label="Data de Conclusão (MM/AAAA)"
-                                           placeholder="MM/AAAA"
-                                           {...controller.actions.register(`schooling.${index}.completionDate`)}
-                                           onChange={(e) => controller.actions.handleDateChange(e, `schooling.${index}.completionDate`)}
-                                           error={controller.states.errors.schooling?.[index]?.completionDate?.message}/>
+                                    <Controller
+                                        name={`schooling.${index}.completionDate`}
+                                        control={controller.actions.control}
+                                        render={({field}) => (
+                                            <Input
+                                                {...field}
+                                                label="Data de Conclusão (MM/AAAA)"
+                                                placeholder="MM/AAAA"
+                                                onChange={(e) => field.onChange(maskMonthYear(e.target.value))}
+                                                error={controller.states.errors.schooling?.[index]?.completionDate?.message}
+                                            />
+                                        )}
+                                    />
                                 </Row>
                             </ExperienceCard>
                         ))}

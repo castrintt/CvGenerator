@@ -6,6 +6,8 @@ export const ApiRoutes = {
   },
   user: {
     create: '/users/create',
+    update: '/users/update',
+    updatePassword: '/users/update_password',
   },
   category: {
     findAll: '/category/findAll',

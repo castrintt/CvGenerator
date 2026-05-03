@@ -2,7 +2,7 @@ import {useFieldArray, useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useNavigate} from 'react-router-dom';
 import {FormData, formSchema} from './FormScreen.types';
-import React, {useEffect, useReducer} from "react";
+import {useEffect, useReducer} from "react";
 import {useResumeContext} from "../../context/ResumeContext.tsx";
 import {formScreenReducer, initialFormScreenUiState} from './FormScreen.reducer';
 
@@ -67,43 +67,6 @@ export const UseFormScreenController = () => {
 
     const goBack = () => navigate('/');
 
-    const maskPhone = (value: string) => {
-        if (!value) return "";
-        value = value.replace(/\D/g, "");
-        if (value.length > 11) value = value.slice(0, 11);
-
-        if (value.length > 10) {
-            return value.replace(/^(\d{2})(\d{1})(\d{4})(\d{4}).*/, "($1) $2 $3-$4");
-        } else if (value.length > 6) {
-            return value.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
-        } else if (value.length > 2) {
-            return value.replace(/^(\d{2})(\d{0,5}).*/, "($1) $2");
-        } else {
-            return value;
-        }
-    };
-
-    const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.target.value = maskPhone(e.target.value);
-        register('personalInfo.phone').onChange(e);
-    };
-
-    const maskDate = (value: string) => {
-        if (!value) return "";
-        value = value.replace(/\D/g, "");
-        if (value.length > 6) value = value.slice(0, 6);
-
-        if (value.length > 2) {
-            return value.replace(/^(\d{2})(\d{0,4}).*/, "$1/$2");
-        } else {
-            return value;
-        }
-    };
-
-    const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>, fieldName: any) => {
-        e.target.value = maskDate(e.target.value);
-        register(fieldName).onChange(e);
-    };
 
     useEffect(() => {
         const handleScroll = () => {
@@ -192,6 +155,7 @@ export const UseFormScreenController = () => {
     return {
         actions: {
             register,
+            control,
             handleSubmit: handleSubmit(onSubmit),
             appendExperience,
             removeExperience,
@@ -206,8 +170,6 @@ export const UseFormScreenController = () => {
             setTemplate: (id: number) => setValue('selectedTemplate', id),
             watch,
             setValue,
-            handlePhoneChange,
-            handleDateChange,
             openActionModal,
             closeActionModal,
             selectTemplateFromModal,
