@@ -7,6 +7,7 @@ import type {DashboardScreenJobApplicationCardProps} from './DashboardScreen.typ
 export const DashboardScreenJobApplicationCard: React.FC<DashboardScreenJobApplicationCardProps> = ({
     jobApplication,
     colorKey,
+    onView,
     onEdit,
     onRemove,
 }) => {
@@ -29,7 +30,13 @@ export const DashboardScreenJobApplicationCard: React.FC<DashboardScreenJobAppli
             <h4>{displayCompany}</h4>
             <p>{displayPosition}</p>
             <p style={{fontSize: 11, marginTop: 4}}>{formatDateBR(jobApplication.appliedDate)}</p>
-            <CardActions>
+            <CardActions
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button type="button" onClick={onView}>
+                    Visualizar
+                </button>
                 <button type="button" onClick={onEdit}>
                     Editar
                 </button>

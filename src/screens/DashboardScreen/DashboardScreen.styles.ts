@@ -581,3 +581,19 @@ export const FormRow = styled.div`
         resize: vertical;
     }
 `;
+
+export const ReadOnlyValue = styled.div`
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    min-height: 44px;
+    white-space: pre-wrap;
+    word-break: break-word;
+
+    a {
+        color: var(--accent-color);
+    }
+`;

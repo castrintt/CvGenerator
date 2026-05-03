@@ -23,6 +23,7 @@ export type DeleteSectionConfirmState = {
 export type DashboardScreenJobApplicationCardProps = {
     jobApplication: JobApplication;
     colorKey: string;
+    onView: () => void;
     onEdit: () => void;
     onRemove: () => void;
 };
@@ -31,6 +32,7 @@ export type DashboardScreenBoardColumnProps = {
     section: Section;
     jobApplications: JobApplication[];
     onAdd: () => void;
+    onView: (item: JobApplication) => void;
     onEdit: (item: JobApplication) => void;
     onRemove: (id: string) => void;
     onEditSection: () => void;
@@ -44,6 +46,8 @@ export type DashboardScreenController = {
         logout: () => Promise<void>;
         openAddModal: (sectionId: string) => void;
         openEditModal: (item: JobApplication) => void;
+        openViewModal: (item: JobApplication) => void;
+        closeViewModal: () => void;
         closeModal: () => void;
         openSectionModal: (section: Section | null, isNew: boolean) => void;
         closeSectionModal: () => void;
@@ -72,6 +76,8 @@ export type DashboardScreenController = {
         activeJobApplication: JobApplication | undefined;
         activeSection: Section | null;
         isJobEditModalOpen: boolean;
+        isViewJobModalOpen: boolean;
+        viewModalJob: JobApplication | null;
         isSectionModalOpen: boolean;
         newJobDefaultDateIso: string;
     };

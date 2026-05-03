@@ -18,6 +18,7 @@ export const DashboardScreenBoardColumn: React.FC<DashboardScreenBoardColumnProp
     section,
     jobApplications,
     onAdd,
+    onView,
     onEdit,
     onRemove,
     onEditSection,
@@ -74,6 +75,7 @@ export const DashboardScreenBoardColumn: React.FC<DashboardScreenBoardColumnProp
                             key={item.id}
                             jobApplication={item}
                             colorKey={section.colorKey}
+                            onView={() => onView(item)}
                             onEdit={() => onEdit(item)}
                             onRemove={() => onRemove(item.id)}
                         />

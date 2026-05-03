@@ -22,11 +22,12 @@ import {
     ModalActions,
     ModalContent,
     ModalOverlay,
+    ReadOnlyValue,
     UserInfo,
 } from './DashboardScreen.styles';
 import {Button} from '../../components/Button/Button';
 import type {DashboardScreenComponentProps} from './DashboardScreen.types';
-import {formatDateBR, maskDateBr} from './DashboardScreen.utils';
+import {formatDateBR, maskDateBr, toExternalHref} from './DashboardScreen.utils';
 import {DashboardScreenBoardColumn} from './DashboardScreen.board-column';
 
 export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> = ({
@@ -77,6 +78,7 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     section={section}
                                     jobApplications={s.jobApplicationsBySection[section.id] ?? []}
                                     onAdd={() => a.openAddModal(section.id)}
+                                    onView={a.openViewModal}
                                     onEdit={a.openEditModal}
                                     onRemove={a.removeJobApplication}
                                     onEditSection={() => a.openSectionModal(section, false)}
@@ -175,6 +177,59 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                 </Button>
                             </ModalActions>
                         </form>
+                    </ModalContent>
+                </ModalOverlay>
+            )}
+
+            {s.isViewJobModalOpen && s.viewModalJob && (
+                <ModalOverlay onClick={a.closeViewModal}>
+                    <ModalContent onClick={(e) => e.stopPropagation()}>
+                        <h3>Detalhes da candidatura</h3>
+                        <FormRow>
+                            <label>Empresa</label>
+                            <ReadOnlyValue>
+                                {s.viewModalJob.company.trim() || '—'}
+                            </ReadOnlyValue>
+                        </FormRow>
+                        <FormRow>
+                            <label>Cargo</label>
+                            <ReadOnlyValue>
+                                {s.viewModalJob.position.trim() || '—'}
+                            </ReadOnlyValue>
+                        </FormRow>
+                        <FormRow>
+                            <label>Data da candidatura</label>
+                            <ReadOnlyValue>
+                                {formatDateBR(s.viewModalJob.appliedDate)}
+                            </ReadOnlyValue>
+                        </FormRow>
+                        <FormRow>
+                            <label>Link (opcional)</label>
+                            <ReadOnlyValue>
+                                {s.viewModalJob.link?.trim() ? (
+                                    <a
+                                        href={toExternalHref(s.viewModalJob.link)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {s.viewModalJob.link}
+                                    </a>
+                                ) : (
+                                    '—'
+                                )}
+                            </ReadOnlyValue>
+                        </FormRow>
+                        <FormRow>
+                            <label>Observações (opcional)</label>
+                            <ReadOnlyValue>
+                                {s.viewModalJob.notes?.trim() ? s.viewModalJob.notes : '—'}
+                            </ReadOnlyValue>
+                        </FormRow>
+                        <ModalActions>
+                            <Button variant="outline" type="button" onClick={a.closeViewModal}>
+                                Fechar
+                            </Button>
+                        </ModalActions>
                     </ModalContent>
                 </ModalOverlay>
             )}

@@ -39,7 +39,7 @@ export const UseDashboardScreenController = () => {
         dashboardScreenReducer,
         initialDashboardScreenUiState,
     );
-    const {editModal, sectionModal, overId, activeId, deleteSectionConfirm} = ui;
+    const {editModal, viewModalJob, sectionModal, overId, activeId, deleteSectionConfirm} = ui;
 
     const logout = async () => {
         await authLogout();
@@ -75,6 +75,14 @@ export const UseDashboardScreenController = () => {
 
     const openEditModal = (item: JobApplication) => {
         dispatch({type: 'OPEN_EDIT_MODAL_EDIT', jobApplication: item});
+    };
+
+    const openViewModal = (item: JobApplication) => {
+        dispatch({type: 'OPEN_VIEW_JOB_MODAL', jobApplication: item});
+    };
+
+    const closeViewModal = () => {
+        dispatch({type: 'CLOSE_VIEW_JOB_MODAL'});
     };
 
     const closeModal = () => {
@@ -216,6 +224,7 @@ export const UseDashboardScreenController = () => {
     };
 
     const isSectionModalOpen = sectionModal.isNew || sectionModal.section !== null;
+    const isViewJobModalOpen = viewModalJob !== null;
     const isJobEditModalOpen =
         editModal.sectionId !== null && (editModal.jobApplication !== null || editModal.isNew);
     const newJobDefaultDateIso = new Date().toISOString().slice(0, 10);
@@ -226,6 +235,8 @@ export const UseDashboardScreenController = () => {
             logout,
             openAddModal,
             openEditModal,
+            openViewModal,
+            closeViewModal,
             closeModal,
             openSectionModal,
             closeSectionModal,
@@ -254,6 +265,8 @@ export const UseDashboardScreenController = () => {
             activeJobApplication,
             activeSection,
             isJobEditModalOpen,
+            isViewJobModalOpen,
+            viewModalJob,
             isSectionModalOpen,
             newJobDefaultDateIso,
         },
