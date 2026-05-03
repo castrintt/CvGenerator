@@ -1,5 +1,6 @@
 export interface CategoryJobItemDto {
   readonly id: string;
+  readonly enterpriseName: string;
   readonly jobTitle: string;
   readonly candidatedAt: string;
   readonly jobLink?: string;

@@ -1,0 +1,24 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+    image: cv-generator:dev
+    container_name: cv-generator-web
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_EMAILJS_SERVICE_ID: ${VITE_EMAILJS_SERVICE_ID:-}
+      VITE_EMAILJS_TEMPLATE_ID: ${VITE_EMAILJS_TEMPLATE_ID:-}
+      VITE_EMAILJS_PUBLIC_KEY: ${VITE_EMAILJS_PUBLIC_KEY:-}
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+    stdin_open: true
+    tty: true
+    restart: unless-stopped

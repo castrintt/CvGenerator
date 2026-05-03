@@ -44,7 +44,7 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                     <span>{s.userEmail}</span>
                     <HeaderActions>
                         <Button variant="outline" onClick={a.handleAddSection}>
-                            + Nova seção
+                            + Nova Categoria
                         </Button>
                         <Button variant="outline" onClick={a.logout}>
                             Sair
@@ -273,19 +273,25 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                     <DeleteModalContent onClick={(e) => e.stopPropagation()}>
                         <h3>Excluir seção</h3>
                         <DeleteModalBody>
-                            <DeleteModalWarning>
-                                Existem {s.deleteSectionConfirm.cardsCount} vaga
-                                {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} cadastrada
-                                {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} na seção{' '}
-                                <DeleteModalSectionName>
-                                    &quot;{s.deleteSectionConfirm.sectionName}&quot;
-                                </DeleteModalSectionName>
-                                .
-                            </DeleteModalWarning>
-                            <DeleteModalWarning>
-                                Se você excluir a seção, todas as vagas atreladas a ela serão perdidas.
-                            </DeleteModalWarning>
-                            <DeleteModalConfirm>Deseja realmente prosseguir?</DeleteModalConfirm>
+                            {s.deleteSectionConfirm.cardsCount > 0 && (
+                                <>
+                                    <DeleteModalWarning>
+                                        Existem {s.deleteSectionConfirm.cardsCount} vaga
+                                        {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} cadastrada
+                                        {s.deleteSectionConfirm.cardsCount === 1 ? '' : 's'} na seção{' '}
+                                        <DeleteModalSectionName>
+                                            &quot;{s.deleteSectionConfirm.sectionName}&quot;
+                                        </DeleteModalSectionName>
+                                        .
+                                    </DeleteModalWarning>
+                                    <DeleteModalWarning>
+                                        Se você excluir a categoria, todas as vagas atreladas a ela serão perdidas.
+                                    </DeleteModalWarning>
+                                </>
+                            )}
+                            <DeleteModalConfirm>
+                                Deseja realmente excluir a categoria &quot;{s.deleteSectionConfirm.sectionName}&quot;?
+                            </DeleteModalConfirm>
                         </DeleteModalBody>
                         <DeleteModalActions>
                             <Button variant="outline" type="button" onClick={a.cancelDeleteSection}>

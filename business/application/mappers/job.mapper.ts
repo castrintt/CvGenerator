@@ -5,7 +5,7 @@ export class JobMapper {
   static toJobApplication(dto: CategoryJobItemDto, categoryId: string): JobApplication {
     return {
       id: dto.id,
-      company: '',
+      company: dto.enterpriseName,
       position: dto.jobTitle,
       appliedDate: dto.candidatedAt
         ? new Date(dto.candidatedAt).toISOString().slice(0, 10)

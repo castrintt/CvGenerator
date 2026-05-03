@@ -10,7 +10,6 @@ import type {Section} from '../../../business/domain/models/section.model';
 import {
     brToIso,
     collisionDetectionStrategy,
-    isJobDragId,
     resolveDropSectionId,
 } from './DashboardScreen.utils';
 import {
@@ -122,7 +121,7 @@ export const UseDashboardScreenController = () => {
             return;
         }
 
-        if (activeType === 'job' && isJobDragId(activeIdStr)) {
+        if (activeType === 'job') {
             const targetSectionId = resolveDropSectionId(
                 overIdStr,
                 sectionIds,
@@ -194,21 +193,16 @@ export const UseDashboardScreenController = () => {
 
     const handleDeleteSection = (sectionId: string) => {
         const section = orderedSections.find((s) => s.id === sectionId);
+        if (!section) return;
         const cardsCount = jobApplicationsBySection[sectionId]?.length ?? 0;
-        if (cardsCount > 0 && section) {
-            dispatch({
-                type: 'SET_DELETE_SECTION_CONFIRM',
-                payload: {
-                    sectionId,
-                    sectionName: section.name,
-                    cardsCount,
-                },
-            });
-        } else {
-            if (window.confirm('Excluir esta seção?')) {
-                removeSection(sectionId);
-            }
-        }
+        dispatch({
+            type: 'SET_DELETE_SECTION_CONFIRM',
+            payload: {
+                sectionId,
+                sectionName: section.name,
+                cardsCount,
+            },
+        });
     };
 
     const confirmDeleteSection = () => {

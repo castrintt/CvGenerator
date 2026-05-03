@@ -45,9 +45,6 @@ export const maskDateBr = (value: string): string => {
     return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 };
 
-export const isJobDragId = (id: string): boolean =>
-    id.startsWith('job-') || id.startsWith('cand-');
-
 export function resolveDropSectionId(
     overId: string | null,
     sectionIds: string[],

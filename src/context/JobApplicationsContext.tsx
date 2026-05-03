@@ -10,7 +10,7 @@ import { selectUserId } from '../store/auth.slice';
 
 interface JobApplicationsContextType {
     jobApplications: JobApplication[];
-    addJobApplication: (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => JobApplication;
+    addJobApplication: (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>) => Promise<void>;
     updateJobApplication: (id: string, data: Partial<JobApplication>) => void;
     moveJobApplication: (id: string, newSectionId: string) => void;
     moveAllFromSection: (fromSectionId: string, toSectionId: string) => void;
@@ -24,11 +24,14 @@ const JobApplicationsContext = createContext<JobApplicationsContextType | undefi
 const categoryService = container.get<ICategoryService>(CategorySymbols.CategoryService);
 const jobService = container.get<IJobService>(JobSymbols.JobService);
 
-const generateId = () => `job-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-
 export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
     const userId = useSelector(selectUserId);
+
+    const refreshJobApplications = useCallback(async (targetUserId: string) => {
+        const { jobApplications: fetched } = await categoryService.findAllCategories(targetUserId);
+        setJobApplications(fetched);
+    }, []);
 
     useEffect(() => {
         if (!userId) {
@@ -36,39 +39,25 @@ export const JobApplicationsProvider: React.FC<{ children: ReactNode }> = ({ chi
             return;
         }
 
-        categoryService
-            .findAllCategories(userId)
-            .then(({ jobApplications: fetched }) => {
-                setJobApplications(fetched);
-            })
-            .catch(() => setJobApplications([]));
-    }, [userId]);
+        refreshJobApplications(userId).catch(() => setJobApplications([]));
+    }, [userId, refreshJobApplications]);
 
     const addJobApplication = useCallback(
-        (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>): JobApplication => {
-            const newItem: JobApplication = {
-                ...data,
-                id: generateId(),
-                sectionId,
-            };
-            setJobApplications((prev) => [...prev, newItem]);
+        async (sectionId: string, data: Omit<JobApplication, 'id' | 'sectionId'>): Promise<void> => {
+            await jobService.createJob({
+                enterpriseName: data.company,
+                jobTitle: data.position,
+                candidatedAt: data.appliedDate,
+                jobLink: data.link ?? '',
+                observation: data.notes ?? '',
+                categoryId: sectionId,
+            });
 
-            jobService
-                .createJob({
-                    enterpriseName: data.company,
-                    jobTitle: data.position,
-                    candidatedAt: data.appliedDate,
-                    jobLink: data.link ?? '',
-                    observation: data.notes ?? '',
-                    categoryId: sectionId,
-                })
-                .catch(() => {
-                    setJobApplications((prev) => prev.filter((j) => j.id !== newItem.id));
-                });
-
-            return newItem;
+            if (userId) {
+                await refreshJobApplications(userId);
+            }
         },
-        [],
+        [userId, refreshJobApplications],
     );
 
     const updateJobApplication = useCallback(
