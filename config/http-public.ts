@@ -12,7 +12,9 @@ export const httpPublic = axios.create({
 httpPublic.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    showApiErrorToast(error);
+    if (error.response?.status !== 401) {
+      showApiErrorToast(error);
+    }
     return Promise.reject(error);
   },
 );

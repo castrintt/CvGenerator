@@ -4,6 +4,8 @@ import { ApiRoutes } from '../business/shared/config/api-routes.config';
 import { AppConfig } from '../business/shared/config/app.config';
 import { showApiErrorToast } from './api-error';
 import { httpPublic } from './http-public';
+import { selectUserId } from '../src/store/auth.slice';
+import { store } from '../src/store/store';
 
 interface RetryableConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -44,6 +46,12 @@ httpPrivate.interceptors.response.use(
 
     if (originalConfig._retry) {
       showApiErrorToast(error);
+      return Promise.reject(error);
+    }
+
+    const isUserAuthenticated = selectUserId(store.getState()) !== null;
+
+    if (!isUserAuthenticated) {
       return Promise.reject(error);
     }
 
