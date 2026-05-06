@@ -32,4 +32,40 @@ describe('Button Component', () => {
         const button = screen.getByText('Full Width');
         expect(button).toBeInTheDocument();
     });
+
+    it('applies disabled when isPending is true', () => {
+        render(<Button isPending>Submit</Button>);
+        const button = screen.getByRole('button');
+        expect(button).toBeDisabled();
+    });
+
+    it('shows loading label when pendingShowsLabel and isPending', () => {
+        render(
+            <Button isPending pendingShowsLabel>
+                Salvar
+            </Button>,
+        );
+        expect(screen.getByRole('button')).toHaveTextContent('Carregando...');
+    });
+
+    it('uses custom pendingLabel when pendingShowsLabel and isPending', () => {
+        render(
+            <Button isPending pendingShowsLabel pendingLabel="Aguarde">
+                Salvar
+            </Button>,
+        );
+        expect(screen.getByRole('button')).toHaveTextContent('Aguarde');
+    });
+
+    it('keeps children text when isPending without pendingShowsLabel', () => {
+        render(<Button isPending>Cancelar</Button>);
+        const button = screen.getByRole('button');
+        expect(button).toHaveTextContent('Cancelar');
+        expect(button).toBeDisabled();
+    });
+
+    it('sets aria-busy when isPending', () => {
+        render(<Button isPending pendingShowsLabel>OK</Button>);
+        expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
+    });
 });

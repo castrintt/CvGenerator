@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthContext.tsx';
 import { JobApplicationsProvider } from './context/JobApplicationsContext.tsx';
 import { SectionsProvider } from './context/SectionsContext.tsx';
 import { ResumeProvider } from './context/ResumeContext.tsx';
+import { GlobalApiLoadingBar } from './components/GlobalApiLoading/GlobalApiLoading.tsx';
 import { ThemeProvider } from './context/ThemeContext.tsx';
 import { store } from './store/store.ts';
 import { clearUser } from './store/auth.slice.ts';
@@ -19,6 +20,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <Provider store={store}>
             <ThemeProvider>
+                <GlobalApiLoadingBar />
                 <AuthProvider>
                     <SectionsProvider>
                         <JobApplicationsProvider>

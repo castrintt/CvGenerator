@@ -26,6 +26,15 @@ export const UseFormScreenController = () => {
         resolver: zodResolver(formSchema),
         mode: 'onChange',
         defaultValues: {
+            personalInfo: {
+                fullName: '',
+                email: '',
+                phone: '',
+                address: '',
+                linkedin: '',
+                website: '',
+            },
+            summary: '',
             experience: [{company: '', position: '', startDate: '', endDate: '', description: '', isCurrent: false}],
             education: [],
             schooling: [],

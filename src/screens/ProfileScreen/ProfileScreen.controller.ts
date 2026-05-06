@@ -10,13 +10,13 @@ import type {
     ProfilePersonalDataFormState,
     ProfileScreenController,
 } from './ProfileScreen.types';
-
-const MINIMUM_PASSWORD_LENGTH = 8;
-
-const hasPasswordComplexity = (password: string): boolean =>
-    /\d/.test(password) && /[^a-zA-Z0-9]/.test(password);
+import type {ZodError} from 'zod';
+import {profilePasswordChangeSchema, profilePersonalDataSchema} from './ProfileScreen.validation';
 
 const userService = container.get<IUserService>(UserSymbols.UserService);
+
+const getFirstZodErrorMessage = (error: ZodError): string =>
+    error.issues[0]?.message ?? 'Dados inválidos.';
 
 export const UseProfileScreenController = (): ProfileScreenController => {
     const navigate = useNavigate();
@@ -53,21 +53,23 @@ export const UseProfileScreenController = (): ProfileScreenController => {
     };
 
     const savePersonalData = async () => {
-        const trimmedName = personalDataForm.name.trim();
-        if (!trimmedName) {
-            toast.error('O nome não pode estar vazio.');
+        const parsedPersonal = profilePersonalDataSchema.safeParse(personalDataForm);
+        if (!parsedPersonal.success) {
+            toast.error(getFirstZodErrorMessage(parsedPersonal.error));
             return;
         }
-        if (!user?.id) return;
+        if (!user?.id) {
+            return;
+        }
 
         setIsSavingPersonalData(true);
         try {
             await userService.updatePersonalData({
                 id: user.id,
-                name: trimmedName,
-                email: personalDataForm.email.trim(),
+                name: parsedPersonal.data.name,
+                email: parsedPersonal.data.email,
             });
-            updateUser({name: trimmedName, email: personalDataForm.email.trim()});
+            updateUser({name: parsedPersonal.data.name, email: parsedPersonal.data.email});
             toast.success('Dados pessoais atualizados com sucesso.');
             setIsEditingPersonalData(false);
         } catch {
@@ -78,29 +80,20 @@ export const UseProfileScreenController = (): ProfileScreenController => {
     };
 
     const submitPasswordChange = async () => {
-        if (!passwordForm.currentPassword) {
-            toast.error('Informe a senha atual.');
+        const parsedPassword = profilePasswordChangeSchema.safeParse(passwordForm);
+        if (!parsedPassword.success) {
+            toast.error(getFirstZodErrorMessage(parsedPassword.error));
             return;
         }
-        if (passwordForm.newPassword.length < MINIMUM_PASSWORD_LENGTH) {
-            toast.error(`A nova senha deve ter pelo menos ${MINIMUM_PASSWORD_LENGTH} caracteres.`);
+        if (!user?.id) {
             return;
         }
-        if (!hasPasswordComplexity(passwordForm.newPassword)) {
-            toast.error('A nova senha precisa conter pelo menos um número e um caractere especial.');
-            return;
-        }
-        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
-            toast.error('A confirmação de senha não coincide com a nova senha.');
-            return;
-        }
-        if (!user?.id) return;
 
         setIsSubmittingPassword(true);
         try {
             await userService.updatePassword({
                 id: user.id,
-                newPassword: passwordForm.newPassword,
+                newPassword: parsedPassword.data.newPassword,
             });
             toast.success('Senha alterada com sucesso.');
             setPasswordForm({currentPassword: '', newPassword: '', confirmPassword: ''});

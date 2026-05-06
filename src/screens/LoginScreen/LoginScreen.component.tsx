@@ -50,9 +50,16 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
     }
 
     if (isRegister) {
+        const isAuthLoading = controller.states.isLoading;
         return (
             <Container>
-                <BackButton onClick={() => controller.actions.setMode('choice')}>← Voltar</BackButton>
+                <BackButton
+                    type="button"
+                    disabled={isAuthLoading}
+                    onClick={() => controller.actions.setMode('choice')}
+                >
+                    ← Voltar
+                </BackButton>
                 <Card>
                     <Header>
                         <h1>Criar conta</h1>
@@ -89,15 +96,24 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                             error={registerForm.formState.errors.confirmPassword?.message}
                         />
                         <ButtonGroup>
-                            <Button type="submit" fullWidth disabled={controller.states.isLoading}>
-                                {controller.states.isLoading ? 'Criando...' : 'Criar conta'}
+                            <Button
+                                type="submit"
+                                fullWidth
+                                isPending={isAuthLoading}
+                                pendingShowsLabel
+                            >
+                                Criar conta
                             </Button>
                         </ButtonGroup>
                     </form>
 
                     <ToggleMode>
                         Já tem conta?{' '}
-                        <button type="button" onClick={() => controller.actions.setMode('login')}>
+                        <button
+                            type="button"
+                            disabled={isAuthLoading}
+                            onClick={() => controller.actions.setMode('login')}
+                        >
                             Fazer login
                         </button>
                     </ToggleMode>
@@ -106,9 +122,16 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
         );
     }
 
+    const isAuthLoading = controller.states.isLoading;
     return (
         <Container>
-            <BackButton onClick={() => controller.actions.setMode('choice')}>← Voltar</BackButton>
+            <BackButton
+                type="button"
+                disabled={isAuthLoading}
+                onClick={() => controller.actions.setMode('choice')}
+            >
+                ← Voltar
+            </BackButton>
             <Card>
                 <Header>
                     <h1>Fazer login</h1>
@@ -131,15 +154,19 @@ export const LoginScreenComponent: React.FC<LoginScreenComponentProps> = ({contr
                         error={loginForm.formState.errors.password?.message}
                     />
                     <ButtonGroup>
-                        <Button type="submit" fullWidth disabled={controller.states.isLoading}>
-                            {controller.states.isLoading ? 'Entrando...' : 'Entrar'}
+                        <Button type="submit" fullWidth isPending={isAuthLoading} pendingShowsLabel>
+                            Entrar
                         </Button>
                     </ButtonGroup>
                 </form>
 
                 <ToggleMode>
                     Não tem conta?{' '}
-                    <button type="button" onClick={() => controller.actions.setMode('register')}>
+                    <button
+                        type="button"
+                        disabled={isAuthLoading}
+                        onClick={() => controller.actions.setMode('register')}
+                    >
                         Criar conta
                     </button>
                 </ToggleMode>

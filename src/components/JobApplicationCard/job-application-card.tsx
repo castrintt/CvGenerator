@@ -36,7 +36,10 @@ export const JobApplicationCard: React.FC<JobApplicationCardProps> = ({
             : jobApplication.notes
         : null;
 
-    const hasLink = Boolean(jobApplication.link?.trim());
+    const safeJobLinkHref = jobApplication.link?.trim()
+        ? toExternalHref(jobApplication.link)
+        : '';
+    const hasSafeJobLink = Boolean(safeJobLinkHref);
 
     return (
         <Card
@@ -54,9 +57,9 @@ export const JobApplicationCard: React.FC<JobApplicationCardProps> = ({
 
             <CardDateRow>
                 <span>Candidatado em {formatDateBR(jobApplication.appliedDate)}</span>
-                {hasLink && (
+                {hasSafeJobLink && (
                     <CardExternalLink
-                        href={toExternalHref(jobApplication.link!)}
+                        href={safeJobLinkHref}
                         target="_blank"
                         rel="noopener noreferrer"
                         onPointerDown={(e) => e.stopPropagation()}

@@ -41,6 +41,15 @@ export const BackButton = styled.button`
     &:hover {
         color: var(--text-primary);
     }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    &:disabled:hover {
+        color: var(--text-secondary);
+    }
 `;
 
 export const PageHeader = styled.div`

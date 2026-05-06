@@ -1,7 +1,8 @@
-import {useEffect, useReducer} from 'react';
+import {useEffect, useReducer, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useForm} from 'react-hook-form';
 import type {SubmitHandler} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
 import type {DragEndEvent, DragStartEvent} from '@dnd-kit/core';
 import {PointerSensor, useSensor, useSensors} from '@dnd-kit/core';
 import {useAuth} from '../../context/AuthContext';
@@ -20,6 +21,7 @@ import {
     dashboardScreenReducer,
     initialDashboardScreenUiState,
 } from './DashboardScreen.reducer';
+import {jobApplicationFormSchema, sectionFormSchema} from './DashboardScreen.schemas';
 
 export const UseDashboardScreenController = () => {
     const navigate = useNavigate();
@@ -44,13 +46,25 @@ export const UseDashboardScreenController = () => {
     );
     const {editModal, viewModalJob, sectionModal, overId, activeId, deleteSectionConfirm} = ui;
 
+    const [isDeletingSection, setIsDeletingSection] = useState(false);
+
     const jobForm = useForm<JobApplicationFormValues>({
+        resolver: zodResolver(jobApplicationFormSchema),
         defaultValues: {company: '', position: '', appliedDate: '', link: '', notes: ''},
     });
 
+    const {
+        formState: {errors: jobFormErrors, isSubmitting: isJobFormSubmitting},
+    } = jobForm;
+
     const sectionForm = useForm<SectionFormValues>({
+        resolver: zodResolver(sectionFormSchema),
         defaultValues: {name: ''},
     });
+
+    const {
+        formState: {errors: sectionFormErrors, isSubmitting: isSectionFormSubmitting},
+    } = sectionForm;
 
     useEffect(() => {
         if (editModal.sectionId === null) {
@@ -190,8 +204,8 @@ export const UseDashboardScreenController = () => {
                 company: values.company,
                 position: values.position,
                 appliedDate: isoDate || todayIso,
-                link: values.link || undefined,
-                notes: values.notes || undefined,
+                link: values.link === '' ? undefined : values.link,
+                notes: values.notes === '' ? undefined : values.notes,
             });
             closeModal();
             return;
@@ -203,23 +217,23 @@ export const UseDashboardScreenController = () => {
             company: values.company,
             position: values.position,
             appliedDate: isoDate || editModal.jobApplication.appliedDate,
-            link: values.link || undefined,
-            notes: values.notes || undefined,
+            link: values.link === '' ? undefined : values.link,
+            notes: values.notes === '' ? undefined : values.notes,
         });
         closeModal();
     };
 
-    const onSubmitSectionForm: SubmitHandler<SectionFormValues> = (values) => {
-        const sectionName = values.name.trim() || 'Nova seção';
+    const onSubmitSectionForm: SubmitHandler<SectionFormValues> = async (values) => {
+        const sectionName = values.name;
 
         if (sectionModal.isNew && !sectionModal.section) {
-            addSection(sectionName);
+            await addSection(sectionName);
             closeSectionModal();
             return;
         }
 
         if (!sectionModal.section) return;
-        updateSection(sectionModal.section.id, {name: sectionName});
+        await updateSection(sectionModal.section.id, {name: sectionName});
         closeSectionModal();
     };
 
@@ -240,12 +254,18 @@ export const UseDashboardScreenController = () => {
     const confirmDeleteSection = async () => {
         if (!deleteSectionConfirm) return;
         const {sectionId} = deleteSectionConfirm;
-        dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
-        await removeSection(sectionId);
-        await refreshJobApplicationsFromBackend();
+        setIsDeletingSection(true);
+        try {
+            await removeSection(sectionId);
+            await refreshJobApplicationsFromBackend();
+            dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
+        } finally {
+            setIsDeletingSection(false);
+        }
     };
 
     const cancelDeleteSection = () => {
+        if (isDeletingSection) return;
         dispatch({type: 'CLEAR_DELETE_SECTION_CONFIRM'});
     };
 
@@ -297,6 +317,11 @@ export const UseDashboardScreenController = () => {
             isSectionModalOpen,
             jobForm,
             sectionForm,
+            jobFormErrors,
+            sectionFormErrors,
+            isJobFormSubmitting,
+            isSectionFormSubmitting,
+            isDeletingSection,
         },
     };
 };

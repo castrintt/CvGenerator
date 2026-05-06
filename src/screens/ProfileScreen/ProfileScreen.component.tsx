@@ -28,11 +28,12 @@ import type {ProfileScreenComponentProps} from './ProfileScreen.types';
 export const ProfileScreenComponent: React.FC<ProfileScreenComponentProps> = ({controller}) => {
     const s = controller.states;
     const a = controller.actions;
+    const isProfileActionPending = s.isSavingPersonalData || s.isSubmittingPassword;
 
     return (
         <Container>
             <PageWrapper>
-                <BackButton type="button" onClick={a.navigateToDashboard}>
+                <BackButton type="button" disabled={isProfileActionPending} onClick={a.navigateToDashboard}>
                     ← Voltar ao Dashboard
                 </BackButton>
 
@@ -97,16 +98,17 @@ export const ProfileScreenComponent: React.FC<ProfileScreenComponentProps> = ({c
                                 variant="outline"
                                 type="button"
                                 onClick={a.cancelPersonalDataEdit}
-                                disabled={s.isSavingPersonalData}
+                                isPending={s.isSavingPersonalData}
                             >
                                 Cancelar
                             </Button>
                             <Button
                                 type="button"
                                 onClick={a.savePersonalData}
-                                disabled={s.isSavingPersonalData}
+                                isPending={s.isSavingPersonalData}
+                                pendingShowsLabel
                             >
-                                {s.isSavingPersonalData ? 'Salvando...' : 'Salvar'}
+                                Salvar
                             </Button>
                         </FormActions>
                     )}
@@ -185,16 +187,17 @@ export const ProfileScreenComponent: React.FC<ProfileScreenComponentProps> = ({c
                             variant="outline"
                             type="button"
                             onClick={a.cancelPasswordChange}
-                            disabled={s.isSubmittingPassword}
+                            isPending={s.isSubmittingPassword}
                         >
                             Cancelar
                         </Button>
                         <Button
                             type="button"
                             onClick={a.submitPasswordChange}
-                            disabled={s.isSubmittingPassword}
+                            isPending={s.isSubmittingPassword}
+                            pendingShowsLabel
                         >
-                            {s.isSubmittingPassword ? 'Atualizando...' : 'Atualizar Senha'}
+                            Atualizar Senha
                         </Button>
                     </FormActions>
                 </SectionCard>

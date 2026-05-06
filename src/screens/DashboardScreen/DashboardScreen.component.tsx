@@ -18,6 +18,7 @@ import {
     DeleteModalSectionName,
     DeleteModalWarning,
     DragOverlayCard,
+    FormFieldError,
     FormRow,
     Header,
     HeaderActions,
@@ -119,6 +120,9 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     {...s.jobForm.register('company')}
                                     placeholder="Nome da empresa"
                                 />
+                                {s.jobFormErrors.company?.message && (
+                                    <FormFieldError>{s.jobFormErrors.company.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <FormRow>
                                 <label>Cargo</label>
@@ -126,6 +130,9 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     {...s.jobForm.register('position')}
                                     placeholder="Cargo desejado"
                                 />
+                                {s.jobFormErrors.position?.message && (
+                                    <FormFieldError>{s.jobFormErrors.position.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <FormRow>
                                 <label>Data da candidatura</label>
@@ -143,6 +150,9 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                         />
                                     )}
                                 />
+                                {s.jobFormErrors.appliedDate?.message && (
+                                    <FormFieldError>{s.jobFormErrors.appliedDate.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <FormRow>
                                 <label>Link (opcional)</label>
@@ -151,6 +161,9 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     type="url"
                                     placeholder="https://..."
                                 />
+                                {s.jobFormErrors.link?.message && (
+                                    <FormFieldError>{s.jobFormErrors.link.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <FormRow>
                                 <label>Observações (opcional)</label>
@@ -158,12 +171,20 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     {...s.jobForm.register('notes')}
                                     placeholder="Notas sobre a vaga..."
                                 />
+                                {s.jobFormErrors.notes?.message && (
+                                    <FormFieldError>{s.jobFormErrors.notes.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <ModalActions>
-                                <Button variant="outline" type="button" onClick={a.closeModal}>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={a.closeModal}
+                                    isPending={s.isJobFormSubmitting}
+                                >
                                     Cancelar
                                 </Button>
-                                <Button type="submit">
+                                <Button type="submit" isPending={s.isJobFormSubmitting} pendingShowsLabel>
                                     Salvar
                                 </Button>
                             </ModalActions>
@@ -197,17 +218,24 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                         <FormRow>
                             <label>Link (opcional)</label>
                             <ReadOnlyValue>
-                                {s.viewModalJob.link?.trim() ? (
-                                    <a
-                                        href={toExternalHref(s.viewModalJob.link)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        {s.viewModalJob.link}
-                                    </a>
-                                ) : (
-                                    '—'
-                                )}
+                                {(() => {
+                                    const rawLink = s.viewModalJob.link?.trim();
+                                    if (!rawLink) {
+                                        return '—';
+                                    }
+                                    const safeHref = toExternalHref(rawLink);
+                                    return safeHref ? (
+                                        <a
+                                            href={safeHref}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            {rawLink}
+                                        </a>
+                                    ) : (
+                                        rawLink
+                                    );
+                                })()}
                             </ReadOnlyValue>
                         </FormRow>
                         <FormRow>
@@ -240,12 +268,20 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                                     {...s.sectionForm.register('name')}
                                     placeholder="Ex: Vagas Candidatadas"
                                 />
+                                {s.sectionFormErrors.name?.message && (
+                                    <FormFieldError>{s.sectionFormErrors.name.message}</FormFieldError>
+                                )}
                             </FormRow>
                             <ModalActions>
-                                <Button variant="outline" type="button" onClick={a.closeSectionModal}>
+                                <Button
+                                    variant="outline"
+                                    type="button"
+                                    onClick={a.closeSectionModal}
+                                    isPending={s.isSectionFormSubmitting}
+                                >
                                     Cancelar
                                 </Button>
-                                <Button type="submit">
+                                <Button type="submit" isPending={s.isSectionFormSubmitting} pendingShowsLabel>
                                     Salvar
                                 </Button>
                             </ModalActions>
@@ -280,10 +316,15 @@ export const DashboardScreenComponent: React.FC<DashboardScreenComponentProps> =
                             </DeleteModalConfirm>
                         </DeleteModalBody>
                         <DeleteModalActions>
-                            <Button variant="outline" type="button" onClick={a.cancelDeleteSection}>
+                            <Button
+                                variant="outline"
+                                type="button"
+                                onClick={a.cancelDeleteSection}
+                                isPending={s.isDeletingSection}
+                            >
                                 Cancelar
                             </Button>
-                            <Button type="button" onClick={a.confirmDeleteSection}>
+                            <Button type="button" onClick={a.confirmDeleteSection} isPending={s.isDeletingSection} pendingShowsLabel>
                                 Prosseguir
                             </Button>
                         </DeleteModalActions>

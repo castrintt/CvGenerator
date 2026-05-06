@@ -90,8 +90,12 @@ export const FeedbackScreenComponent: React.FC<FeedbackScreenComponentProps> = (
                         {controller.states.errors.feedback &&
                             <span style={{ color: '#EB5757' }}>{controller.states.errors.feedback.message}</span>}
 
-                        <Button type="submit" disabled={controller.states.isSubmitting}>
-                            {controller.states.isSubmitting ? 'Enviando...' : 'Enviar Feedback'}
+                        <Button
+                            type="submit"
+                            isPending={controller.states.isSubmitting}
+                            pendingShowsLabel
+                        >
+                            Enviar Feedback
                         </Button>
                     </FeedbackForm>
                 )}

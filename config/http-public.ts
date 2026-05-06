@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { AxiosError } from 'axios';
 import { AppConfig } from '../business/shared/config/app.config';
+import { attachGlobalApiLoading } from './global-api-loading';
 import { showApiErrorToast } from './api-error';
 
 export const httpPublic = axios.create({
@@ -8,6 +9,8 @@ export const httpPublic = axios.create({
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
+
+attachGlobalApiLoading(httpPublic);
 
 httpPublic.interceptors.response.use(
   (response) => response,

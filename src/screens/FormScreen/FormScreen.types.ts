@@ -2,25 +2,58 @@ import {z} from 'zod';
 import React from 'react';
 import {ResumeTemplate} from '../../../business/domain/models/curriculum.model';
 import type {ResumeData} from '../../../business/domain/models/curriculum.model';
+import {INPUT_LIMITS} from '../../../business/shared/validation/limits';
+import {zodResumeOptionalProfileLinkField} from '../../../business/shared/validation/safe-http-url';
 
 export const personalInfoSchema = z.object({
-    fullName: z.string().min(3, 'Nome completo é obrigatório'),
-    email: z.string().email('Endereço de e-mail inválido'),
-    phone: z.string().min(10, 'Número de telefone é obrigatório'),
-    address: z.string().min(5, 'Endereço é obrigatório'),
-    linkedin: z.string().optional(),
-    website: z.string().optional(),
+    fullName: z
+        .string()
+        .trim()
+        .min(3, 'Nome completo é obrigatório')
+        .max(INPUT_LIMITS.personName, `Máximo de ${INPUT_LIMITS.personName} caracteres`),
+    email: z
+        .string()
+        .trim()
+        .email('Endereço de e-mail inválido')
+        .max(INPUT_LIMITS.email, `Máximo de ${INPUT_LIMITS.email} caracteres`),
+    phone: z
+        .string()
+        .trim()
+        .min(10, 'Número de telefone é obrigatório')
+        .max(30, 'Telefone muito longo'),
+    address: z
+        .string()
+        .trim()
+        .min(5, 'Endereço é obrigatório')
+        .max(300, 'Endereço muito longo'),
+    linkedin: zodResumeOptionalProfileLinkField,
+    website: zodResumeOptionalProfileLinkField,
 });
 
 const dateRegex = /^(0[1-9]|1[0-2])\/\d{4}$/;
 
 export const experienceSchema = z.object({
-    company: z.string().min(2, 'Nome da empresa é obrigatório'),
-    position: z.string().min(2, 'Cargo é obrigatório'),
-    startDate: z.string().regex(dateRegex, 'Data inválida (MM/AAAA)'),
-    endDate: z.string().optional(),
+    company: z
+        .string()
+        .trim()
+        .min(2, 'Nome da empresa é obrigatório')
+        .max(INPUT_LIMITS.companyName, `Máximo de ${INPUT_LIMITS.companyName} caracteres`),
+    position: z
+        .string()
+        .trim()
+        .min(2, 'Cargo é obrigatório')
+        .max(INPUT_LIMITS.jobTitle, `Máximo de ${INPUT_LIMITS.jobTitle} caracteres`),
+    startDate: z.string().trim().regex(dateRegex, 'Data inválida (MM/AAAA)'),
+    endDate: z.preprocess(
+        (value) => (value === '' || value === undefined || value === null ? undefined : value),
+        z.string().trim().max(10).optional(),
+    ),
     isCurrent: z.boolean().optional(),
-    description: z.string().min(10, 'Descrição deve ter no minimo 10 caracteres'),
+    description: z
+        .string()
+        .trim()
+        .min(10, 'Descrição deve ter no minimo 10 caracteres')
+        .max(INPUT_LIMITS.experienceDescription, `Máximo de ${INPUT_LIMITS.experienceDescription} caracteres`),
 }).refine((data) => {
     if (!data.isCurrent) {
         if (!data.endDate) return false;
@@ -33,10 +66,25 @@ export const experienceSchema = z.object({
 });
 
 export const educationSchema = z.object({
-    institution: z.string().min(2, 'Instituição é obrigatória'),
-    degree: z.string().min(2, 'Grau é obrigatório'),
-    fieldOfStudy: z.string().min(2, 'Área de estudo é obrigatória'),
-    graduationDate: z.string().optional(),
+    institution: z
+        .string()
+        .trim()
+        .min(2, 'Instituição é obrigatória')
+        .max(INPUT_LIMITS.institution, `Máximo de ${INPUT_LIMITS.institution} caracteres`),
+    degree: z
+        .string()
+        .trim()
+        .min(2, 'Grau é obrigatório')
+        .max(INPUT_LIMITS.degree, `Máximo de ${INPUT_LIMITS.degree} caracteres`),
+    fieldOfStudy: z
+        .string()
+        .trim()
+        .min(2, 'Área de estudo é obrigatória')
+        .max(INPUT_LIMITS.fieldOfStudy, `Máximo de ${INPUT_LIMITS.fieldOfStudy} caracteres`),
+    graduationDate: z.preprocess(
+        (value) => (value === '' || value === undefined || value === null ? undefined : value),
+        z.string().trim().max(10).optional(),
+    ),
     isStudying: z.boolean().optional(),
 }).refine((data) => {
     if (!data.isStudying) {
@@ -53,20 +101,46 @@ export const educationSchema = z.object({
 });
 
 export const schoolingSchema = z.object({
-    institution: z.string().min(2, 'Instituição é obrigatória'),
-    degree: z.string().min(2, 'Grau/Nível é obrigatório'),
-    completionDate: z.string().optional(),
+    institution: z
+        .string()
+        .trim()
+        .min(2, 'Instituição é obrigatória')
+        .max(INPUT_LIMITS.institution, `Máximo de ${INPUT_LIMITS.institution} caracteres`),
+    degree: z
+        .string()
+        .trim()
+        .min(2, 'Grau/Nível é obrigatório')
+        .max(INPUT_LIMITS.degree, `Máximo de ${INPUT_LIMITS.degree} caracteres`),
+    completionDate: z.preprocess(
+        (value) => (value === '' || value === undefined || value === null ? undefined : value),
+        z.string().trim().max(10).optional(),
+    ),
 });
 
 export const courseSchema = z.object({
-    name: z.string().min(2, 'Nome do curso é obrigatório'),
-    institution: z.string().min(2, 'Instituição é obrigatória'),
-    duration: z.string().optional(),
+    name: z
+        .string()
+        .trim()
+        .min(2, 'Nome do curso é obrigatório')
+        .max(INPUT_LIMITS.courseName, `Máximo de ${INPUT_LIMITS.courseName} caracteres`),
+    institution: z
+        .string()
+        .trim()
+        .min(2, 'Instituição é obrigatória')
+        .max(INPUT_LIMITS.institution, `Máximo de ${INPUT_LIMITS.institution} caracteres`),
+    duration: z.preprocess(
+        (value) => (value === '' || value === undefined || value === null ? undefined : value),
+        z.string().trim().max(INPUT_LIMITS.courseDuration, `Máximo de ${INPUT_LIMITS.courseDuration} caracteres`).optional(),
+    ),
 });
 
 export const formSchema = z.object({
     personalInfo: personalInfoSchema,
-    summary: z.string().min(20, 'O resumo deve ter pelo menos 20 caracteres'),
+    summary: z
+        .string()
+        .trim()
+        .min(20, 'O resumo deve ter pelo menos 20 caracteres')
+        .max(INPUT_LIMITS.summary, `Máximo de ${INPUT_LIMITS.summary} caracteres`),
     experience: z.array(experienceSchema).optional(),
     education: z.array(educationSchema).optional(),
     schooling: z.array(schoolingSchema).optional(),
@@ -98,7 +172,7 @@ export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
         email: 'maria.oliveira@email.com',
         phone: '(11) 98765-4321',
         address: 'Rio de Janeiro, RJ',
-        linkedin: 'linkedin.com/in/mariaoliveira',
+        linkedin: 'https://linkedin.com/in/mariaoliveira',
     },
     summary:
         'Profissional organizada e proativa com experiência em atendimento ao cliente e gestão administrativa. Busco oportunidades para aplicar minhas habilidades de comunicação e resolução de problemas.',
@@ -106,8 +180,8 @@ export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
         {
             company: 'Comércio & Cia',
             position: 'Assistente Administrativo',
-            startDate: '2019-03',
-            endDate: '2022-05',
+            startDate: '03/2019',
+            endDate: '05/2022',
             description:
                 'Responsável pelo atendimento ao cliente, organização de arquivos e suporte à gerência.',
         },
@@ -117,14 +191,14 @@ export const FORM_SCREEN_PREVIEW_FAKE_DATA: ResumeData = {
             institution: 'Universidade Federal',
             degree: 'Bacharelado',
             fieldOfStudy: 'Administração',
-            graduationDate: '2018-12',
+            graduationDate: '12/2018',
         },
     ],
     schooling: [
         {
             institution: 'Escola Estadual',
             degree: 'Ensino Médio Completo',
-            completionDate: '2014-12',
+            completionDate: '12/2014',
         },
     ],
     courses: [

@@ -1,19 +1,13 @@
 import type {CollisionDetection} from '@dnd-kit/core';
 import {closestCenter, pointerWithin} from '@dnd-kit/core';
 import type {JobApplication} from '../../../business/domain/models/jobApplication.model';
+import {toSafeHttpHref} from '../../../business/shared/validation/safe-http-url';
 
 /**
- * Garante URL absoluta para abrir no navegador. Entradas como "youtube.com" viram https://youtube.com
- * e deixam de ser interpretadas como rota relativa da SPA.
+ * URL segura para usar em href (apenas http/https). Entradas como "youtube.com" viram https://youtube.com.
+ * Retorna string vazia para protocolos perigosos ou URLs inválidas.
  */
-export const toExternalHref = (raw: string): string => {
-    const trimmed = raw.trim();
-    if (!trimmed) return '';
-    if (/^https?:\/\//i.test(trimmed)) return trimmed;
-    if (trimmed.startsWith('//')) return `https:${trimmed}`;
-    if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed;
-    return `https://${trimmed}`;
-};
+export const toExternalHref = (raw: string): string => toSafeHttpHref(raw);
 
 export const formatDateBR = (isoDate: string): string => {
     if (!isoDate) return '';

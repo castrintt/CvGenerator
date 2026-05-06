@@ -2,6 +2,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import axios from 'axios';
 import { ApiRoutes } from '../business/shared/config/api-routes.config';
 import { AppConfig } from '../business/shared/config/app.config';
+import { attachGlobalApiLoading } from './global-api-loading';
 import { showApiErrorToast } from './api-error';
 import { httpPublic } from './http-public';
 import { selectUserId } from '../src/store/auth.slice';
@@ -34,6 +35,8 @@ export const httpPrivate = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+attachGlobalApiLoading(httpPrivate);
+
 httpPrivate.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
@@ -65,7 +68,9 @@ httpPrivate.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      await httpPublic.post(ApiRoutes.auth.refresh);
+      await httpPublic.post(ApiRoutes.auth.refresh, undefined, {
+        skipGlobalLoading: true,
+      });
       drainQueue();
       return httpPrivate(originalConfig);
     } catch (refreshError) {

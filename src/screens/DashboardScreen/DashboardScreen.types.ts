@@ -1,8 +1,10 @@
+import type { z } from 'zod';
 import type { CollisionDetection } from '@dnd-kit/core';
 import type { SensorDescriptor } from '@dnd-kit/core';
-import type { UseFormReturn, SubmitHandler } from 'react-hook-form';
+import type { UseFormReturn, SubmitHandler, FieldErrors } from 'react-hook-form';
 import type { JobApplication } from '../../../business/domain/models/jobApplication.model';
 import type { Section } from '../../../business/domain/models/section.model';
+import { jobApplicationFormSchema, sectionFormSchema } from './DashboardScreen.schemas';
 
 export type EditModalState = {
     jobApplication: JobApplication | null;
@@ -21,17 +23,8 @@ export type DeleteSectionConfirmState = {
     cardsCount: number;
 } | null;
 
-export type JobApplicationFormValues = {
-    company: string;
-    position: string;
-    appliedDate: string;
-    link: string;
-    notes: string;
-};
-
-export type SectionFormValues = {
-    name: string;
-};
+export type JobApplicationFormValues = z.infer<typeof jobApplicationFormSchema>;
+export type SectionFormValues = z.infer<typeof sectionFormSchema>;
 
 export type DashboardScreenBoardColumnProps = {
     section: Section;
@@ -64,7 +57,7 @@ export type DashboardScreenController = {
         onSubmitJobApplicationForm: SubmitHandler<JobApplicationFormValues>;
         onSubmitSectionForm: SubmitHandler<SectionFormValues>;
         handleDeleteSection: (sectionId: string) => void;
-        confirmDeleteSection: () => void;
+        confirmDeleteSection: () => Promise<void>;
         cancelDeleteSection: () => void;
     };
     states: {
@@ -88,6 +81,11 @@ export type DashboardScreenController = {
         isSectionModalOpen: boolean;
         jobForm: UseFormReturn<JobApplicationFormValues>;
         sectionForm: UseFormReturn<SectionFormValues>;
+        jobFormErrors: FieldErrors<JobApplicationFormValues>;
+        sectionFormErrors: FieldErrors<SectionFormValues>;
+        isJobFormSubmitting: boolean;
+        isSectionFormSubmitting: boolean;
+        isDeletingSection: boolean;
     };
 };
 

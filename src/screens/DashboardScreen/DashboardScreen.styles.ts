@@ -650,6 +650,12 @@ export const FormRow = styled.div`
     }
 `;
 
+export const FormFieldError = styled.p`
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--danger-color, #c62828);
+`;
+
 export const ReadOnlyValue = styled.div`
     padding: 12px 14px;
     border: 1px solid var(--border-color);

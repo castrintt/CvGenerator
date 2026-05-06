@@ -107,6 +107,11 @@ export const BackButton = styled.button`
         color: var(--accent-color);
     }
 
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
     @media (max-width: 480px) {
         top: 16px;
         left: 16px;
@@ -138,6 +143,12 @@ export const ToggleMode = styled.p`
 
         &:hover {
             opacity: 0.9;
+        }
+
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            text-decoration: none;
         }
     }
 `;
