@@ -1,7 +1,7 @@
-import axios from 'axios';
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { AppConfig } from '../business/shared/config/app.config';
+import axios from 'axios';
 import { ApiRoutes } from '../business/shared/config/api-routes.config';
+import { AppConfig } from '../business/shared/config/app.config';
 import { showApiErrorToast } from './api-error';
 import { httpPublic } from './http-public';
 

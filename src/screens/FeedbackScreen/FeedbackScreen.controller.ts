@@ -1,10 +1,10 @@
-import {useEffect, useState} from 'react';
-import {useForm} from 'react-hook-form';
-import {zodResolver} from '@hookform/resolvers/zod';
-import {FeedbackData, feedbackSchema, type ResumeControllerInjectTypes} from './FeedbackScreen.types';
-import {useResumeContext} from "../../context/ResumeContext.tsx";
-import {useNavigate} from "react-router-dom";
 import emailjs from '@emailjs/browser';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from "react-router-dom";
+import { useResumeContext } from "../../context/ResumeContext.tsx";
+import { FeedbackData, feedbackSchema, type ResumeControllerInjectTypes } from './FeedbackScreen.types';
 
 export const UseFeedbackScreenController = ({resumeService}: ResumeControllerInjectTypes) => {
     const [isFeedbackSent, setIsFeedbackSent] = useState(false);
